@@ -112,14 +112,15 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useCallback, useRef } = React;
-const TABS = ["Dashboard", "Ventas", "Stock", "Cuentas", "Alertas"];
+const TABS = ["Dashboard", "Ventas", "Stock", "Gastos", "Cuentas", "Alertas"];
+const EXPENSE_CATS = ["Packaging", "Transporte", "Publicidad", "Suscripciones", "Compra de stock", "Otro"];
 
 // ─── FIREBASE CONFIG ──────────────────────────────────────────────
 // Rellena estos valores con los de tu proyecto Firebase
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDOXzUoalwy-nScM1TaHzGGQ7rnoPnquU4",
-  authDomain: "vinted-crm-bd15e.firebaseapp.com",
-  projectId: "vinted-crm-bd15e",
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
 };
 // ─────────────────────────────────────────────────────────────────
 
@@ -211,6 +212,29 @@ function App() {
     return {...acc, count:accSales.length, revenue:accSales.reduce((a,s)=>a+s.price,0), profit:accSales.reduce((a,s)=>a+s.profit,0)};
   }).sort((a,b)=>b.revenue-a.revenue);
 
+  // Gastos
+  const expenses = state.expenses || [];
+  const now2 = new Date();
+  const y = now2.getFullYear(), m = now2.getMonth();
+  
+  // Auto-generar recurrentes del mes actual si no existen
+  const recurrentes = expenses.filter(e => e.recurrent);
+  const yaGenerados = expenses.filter(e => e.generatedFrom);
+  recurrentes.forEach(r => {
+    const yaEste = yaGenerados.some(g => g.generatedFrom === r.id && new Date(g.date).getMonth() === m && new Date(g.date).getFullYear() === y);
+    if (!yaEste) {
+      const auto = { ...r, id: Date.now() + Math.random(), recurrent: false, generatedFrom: r.id, date: `${y}-${String(m+1).padStart(2,'0')}-01` };
+      state = { ...state, expenses: [...(state.expenses||[]), auto] };
+    }
+  });
+
+  const weekExpenses = expenses.filter(e => new Date(e.date) >= weekAgo && !e.recurrent).reduce((a,e)=>a+e.amount,0);
+  const monthExpenses = expenses.filter(e => { const d=new Date(e.date); return d>=monthAgo && !e.recurrent; }).reduce((a,e)=>a+e.amount,0);
+  const totalExpenses = expenses.filter(e=>!e.recurrent).reduce((a,e)=>a+e.amount,0);
+  const weekNet = weekProfit - weekExpenses;
+  const monthNet = monthProfit - monthExpenses;
+  const totalNet = totalProfit - totalExpenses;
+
   const modelStats = {};
   salesEnriched.forEach(s=>{
     if(!modelStats[s.model]) modelStats[s.model]={count:0,revenue:0,profit:0};
@@ -219,7 +243,7 @@ function App() {
   const topModels = Object.entries(modelStats).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
   const f = n => n.toFixed(2)+"€";
   const syncLabel = syncStatus==="syncing"?"Sincronizando…":syncStatus==="error"?"Sin conexión":lastSync?`Sync ${lastSync.toLocaleTimeString("es",{hour:"2-digit",minute:"2-digit"})}`:"Conectado";
-  const props = {state,update,salesEnriched,accountStats,topModels,alerts,weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit,avgMargin,f};
+  const props = {state,update,salesEnriched,accountStats,topModels,alerts,weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit,avgMargin,f,weekExpenses,monthExpenses,totalExpenses,weekNet,monthNet,totalNet};
 
   return (
     <div className="app">
@@ -246,6 +270,7 @@ function App() {
         {tab==="Dashboard" && <Dashboard {...props}/>}
         {tab==="Ventas" && <Ventas {...props}/>}
         {tab==="Stock" && <Stock {...props}/>}
+        {tab==="Gastos" && <Gastos {...props}/>}
         {tab==="Cuentas" && <Cuentas {...props}/>}
         {tab==="Alertas" && <Alertas {...props}/>}
       </div>
@@ -267,7 +292,7 @@ function Setup({onDone}) {
             3. Activa <strong>Firestore Database</strong> en modo test<br/>
             4. Ve a Configuración del proyecto → tu app web<br/>
             5. Copia los valores de <code>firebaseConfig</code><br/>
-            6. Pégalos en el objeto <code></code> del archivo <code>index.html</code>
+            6. Pégalos en el objeto <code>FIREBASE_CONFIG</code> del archivo <code>index.html</code>
           </div>
           <div style={{fontSize:12,color:"#334155",background:"#080c14",borderRadius:8,padding:"12px 14px",fontFamily:"monospace",lineHeight:1.8}}>
             apiKey: "TU_API_KEY"<br/>
@@ -280,7 +305,7 @@ function Setup({onDone}) {
   );
 }
 
-function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit,avgMargin,salesEnriched,accountStats,topModels,alerts,f}) {
+function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit,avgMargin,salesEnriched,accountStats,topModels,alerts,f,weekExpenses,monthExpenses,totalExpenses,weekNet,monthNet,totalNet}) {
   const maxRev = accountStats[0]?.revenue||1;
   const maxMod = topModels[0]?.[1]?.count||1;
   return (
@@ -288,10 +313,10 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
       <div className="sec"><span className="sec-dot"/>KPIs Financieros</div>
       <div className="g4" style={{marginBottom:14}}>
         {[
-          {label:"Esta semana",val:f(weekRev),sub:`Beneficio ${f(weekProfit)}`,cls:"kpi-purple"},
-          {label:"Últimos 30 días",val:f(monthRev),sub:`Beneficio ${f(monthProfit)}`,cls:"kpi-purple"},
+          {label:"Esta semana",val:f(weekRev),sub:`Beneficio bruto ${f(weekProfit)}`,cls:"kpi-purple"},
+          {label:"Últimos 30 días",val:f(monthRev),sub:`Beneficio bruto ${f(monthProfit)}`,cls:"kpi-purple"},
           {label:"Facturación total",val:f(totalRev),sub:`${salesEnriched.length} ventas`,cls:""},
-          {label:"Beneficio total",val:f(totalProfit),sub:`Margen ${avgMargin.toFixed(1)}%`,cls:"kpi-green"},
+          {label:"Beneficio total bruto",val:f(totalProfit),sub:`Margen ${avgMargin.toFixed(1)}%`,cls:"kpi-green"},
         ].map(k=>(
           <div key={k.label} className="card">
             <div className="kpi-label">{k.label}</div>
@@ -299,6 +324,23 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
             <div className="kpi-sub">{k.sub}</div>
           </div>
         ))}
+      </div>
+      <div className="g3" style={{marginBottom:14}}>
+        <div className="card">
+          <div className="kpi-label">Gastos semana</div>
+          <div className="kpi-val kpi-red">{f(weekExpenses)}</div>
+          <div className="kpi-sub">Neto: <span style={{color:weekNet>=0?"#10b981":"#ef4444",fontWeight:700}}>{f(weekNet)}</span></div>
+        </div>
+        <div className="card">
+          <div className="kpi-label">Gastos 30 días</div>
+          <div className="kpi-val kpi-red">{f(monthExpenses)}</div>
+          <div className="kpi-sub">Neto: <span style={{color:monthNet>=0?"#10b981":"#ef4444",fontWeight:700}}>{f(monthNet)}</span></div>
+        </div>
+        <div className="card" style={{border:"1px solid rgba(16,185,129,.2)",background:"rgba(16,185,129,.04)"}}>
+          <div className="kpi-label">Beneficio neto total</div>
+          <div className={`kpi-val ${totalNet>=0?"kpi-green":"kpi-red"}`}>{f(totalNet)}</div>
+          <div className="kpi-sub">Gastos totales: {f(totalExpenses)}</div>
+        </div>
       </div>
       <div className="g2">
         <div className="card">
@@ -586,6 +628,93 @@ function Cuentas({state,update,accountStats,f}) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Gastos({state,update,f}) {
+  const [form,setForm] = useState({desc:"",category:"Packaging",amount:"",date:new Date().toISOString().slice(0,10),recurrent:false});
+  const [filter,setFilter] = useState("all");
+  const expenses = state.expenses||[];
+
+  const handleAdd = () => {
+    if(!form.desc||!form.amount) return;
+    const exp = {...form,id:Date.now(),amount:parseFloat(form.amount)};
+    update(s=>({...s,expenses:[exp,...(s.expenses||[])]}));
+    setForm(f=>({...f,desc:"",amount:""}));
+  };
+
+  const filtered = filter==="all"?expenses:filter==="recurrent"?expenses.filter(e=>e.recurrent):expenses.filter(e=>!e.recurrent&&!e.generatedFrom);
+  const totalFiltered = filtered.reduce((a,e)=>a+e.amount,0);
+
+  const byCategory = EXPENSE_CATS.map(cat=>({
+    cat, total: expenses.filter(e=>e.category===cat&&!e.recurrent).reduce((a,e)=>a+e.amount,0)
+  })).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
+  const maxCat = byCategory[0]?.total||1;
+
+  return (
+    <div>
+      <div className="sec"><span className="sec-dot"/>Registrar gasto</div>
+      <div className="card" style={{marginBottom:20}}>
+        <div className="fr3">
+          <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Bolsas packaging x100" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Categoría</label>
+            <select className="fi" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
+              {EXPENSE_CATS.map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="fg"><label className="fl">Importe (€)</label><input className="fi" type="number" placeholder="0.00" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))}/></div>
+        </div>
+        <div className="fr2">
+          <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></div>
+          <div className="fg" style={{display:"flex",alignItems:"center",gap:10,paddingTop:20}}>
+            <input type="checkbox" id="recurrent" checked={form.recurrent} onChange={e=>setForm(f=>({...f,recurrent:e.target.checked}))} style={{width:16,height:16,accentColor:"#6366f1"}}/>
+            <label htmlFor="recurrent" style={{fontSize:13,color:"#94a3b8",cursor:"pointer"}}>Gasto recurrente mensual</label>
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={handleAdd}>+ Añadir gasto</button>
+      </div>
+
+      {byCategory.length>0&&(
+        <>
+          <div className="sec"><span className="sec-dot"/>Gastos por categoría</div>
+          <div className="card" style={{marginBottom:20}}>
+            {byCategory.map(({cat,total})=>(
+              <div key={cat} className="mini-row">
+                <div className="mini-label">{cat}</div>
+                <div className="mini-track"><div className="mini-fill" style={{width:`${(total/maxCat)*100}%`,background:"linear-gradient(90deg,#ef4444,#f97316)"}}/></div>
+                <div className="mini-val">{total.toFixed(0)}€</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="flex-between" style={{marginBottom:12}}>
+        <div className="sec" style={{margin:0}}><span className="sec-dot"/>Historial · {f(totalFiltered)}</div>
+        <div style={{display:"flex",gap:6}}>
+          {[["all","Todos"],["recurrent","Recurrentes"],["one","Puntuales"]].map(([v,l])=>(
+            <button key={v} className={"btn "+(filter===v?"btn-primary":"btn-ghost")} style={{padding:"5px 12px",fontSize:12}} onClick={()=>setFilter(v)}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <div className="card">
+        {filtered.length===0?<div className="empty">No hay gastos registrados</div>:(
+          <table className="tbl">
+            <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th></th></tr></thead>
+            <tbody>{filtered.map(e=>(
+              <tr key={e.id}>
+                <td style={{color:"#334155",fontSize:12}}>{e.date}</td>
+                <td style={{fontWeight:600}}>{e.desc}</td>
+                <td><span className="tag">{e.category}</span></td>
+                <td>{e.recurrent?<span className="badge bg-purple">Recurrente</span>:e.generatedFrom?<span className="badge bg-blue">Auto</span>:<span className="badge" style={{background:"rgba(100,116,139,.1)",color:"#64748b",border:"1px solid rgba(100,116,139,.2)"}}>Puntual</span>}</td>
+                <td style={{color:"#f87171",fontWeight:700}}>{f(e.amount)}</td>
+                <td><button className="btn btn-del" onClick={()=>update(s=>({...s,expenses:(s.expenses||[]).filter(x=>x.id!==e.id)}))}>✕</button></td>
+              </tr>
+            ))}</tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
