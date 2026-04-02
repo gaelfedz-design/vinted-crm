@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Vinted CRM</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
@@ -18,7 +17,7 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 ::-webkit-scrollbar-track{background:#080c14;}
 ::-webkit-scrollbar-thumb{background:#1e2740;border-radius:3px;}
 .app{min-height:100vh;}
-.header{background:linear-gradient(135deg,#0d1117 0%,#0f1729 100%);border-bottom:1px solid #1a2236;padding:16px 28px;display:flex;align-items:center;gap:14px;}
+.header{background:linear-gradient(135deg,#0d1117,#0f1729);border-bottom:1px solid #1a2236;padding:16px 28px;display:flex;align-items:center;gap:14px;}
 .logo-wrap{display:flex;align-items:center;gap:12px;}
 .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 16px rgba(99,102,241,.4);}
 .logo-text{font-size:19px;font-weight:800;background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
@@ -44,7 +43,7 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 .kpi-label{font-size:11px;color:#475569;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
 .kpi-val{font-size:26px;font-weight:800;color:#f1f5f9;letter-spacing:-.5px;}
 .kpi-sub{font-size:12px;color:#475569;margin-top:4px;}
-.kpi-green{color:#10b981;}.kpi-red{color:#ef4444;}.kpi-yellow{color:#f59e0b;}.kpi-purple{color:#818cf8;}
+.kpi-green{color:#10b981!important;}.kpi-red{color:#ef4444!important;}.kpi-yellow{color:#f59e0b!important;}.kpi-purple{color:#818cf8!important;}
 .sec{font-size:16px;font-weight:700;color:#e2e8f0;margin:22px 0 12px;display:flex;align-items:center;gap:8px;}
 .sec:first-child{margin-top:0;}
 .sec-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);flex-shrink:0;}
@@ -53,9 +52,9 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 .btn-primary:hover{box-shadow:0 4px 16px rgba(99,102,241,.4);transform:translateY(-1px);}
 .btn-ghost{background:transparent;border:1px solid #1e2740;color:#64748b;}
 .btn-ghost:hover{background:#1a2236;color:#94a3b8;}
-.btn-del{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.15);padding:4px 10px;font-size:11px;border-radius:7px;}
+.btn-del{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.15);padding:4px 10px;font-size:11px;border-radius:7px;cursor:pointer;}
 .btn-del:hover{background:rgba(239,68,68,.15);}
-.btn-edit{background:rgba(99,102,241,.08);color:#818cf8;border:1px solid rgba(99,102,241,.15);padding:4px 10px;font-size:11px;border-radius:7px;}
+.btn-edit{background:rgba(99,102,241,.08);color:#818cf8;border:1px solid rgba(99,102,241,.15);padding:4px 10px;font-size:11px;border-radius:7px;cursor:pointer;}
 .btn-edit:hover{background:rgba(99,102,241,.15);}
 .fl{font-size:12px;color:#64748b;margin-bottom:5px;display:block;font-weight:500;}
 .fi{width:100%;background:#080c14;border:1px solid #1a2236;border-radius:9px;padding:9px 12px;color:#f1f5f9;font-size:13px;outline:none;transition:border .15s;}
@@ -72,6 +71,9 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 .bg-green{background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.2);}
 .bg-red{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);}
 .bg-yellow{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+.bg-purple{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.25);}
+.bg-blue{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2);}
+.bg-gray{background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid rgba(100,116,139,.2);}
 .tag{display:inline-block;background:#1a2236;color:#64748b;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:600;}
 .alert-box{border-radius:12px;padding:14px 18px;margin-bottom:10px;border-left:3px solid;display:flex;justify-content:space-between;align-items:center;}
 .ab-red{background:rgba(239,68,68,.06);border-color:#ef4444;}
@@ -98,13 +100,8 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 .profit-preview{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.12);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#64748b;display:flex;gap:16px;}
 .pp-item{display:flex;flex-direction:column;gap:2px;}
 .pp-val{font-size:15px;font-weight:700;}
-.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;background:#080c14;}
 .spinner{width:36px;height:36px;border:3px solid #1a2236;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;}
-.setup-card{background:#0d1117;border:1px solid #1a2236;border-radius:16px;padding:32px;max-width:480px;width:90%;}
-.setup-title{font-size:20px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.setup-sub{font-size:13px;color:#475569;margin-bottom:24px;line-height:1.6;}
-.setup-link{color:#818cf8;text-decoration:none;}
-.setup-link:hover{text-decoration:underline;}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
@@ -112,17 +109,15 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useCallback, useRef } = React;
+
 const TABS = ["Dashboard", "Ventas", "Stock", "Gastos", "Cuentas", "Alertas"];
 const EXPENSE_CATS = ["Packaging", "Transporte", "Publicidad", "Suscripciones", "Compra de stock", "Otro"];
 
-// ─── FIREBASE CONFIG ──────────────────────────────────────────────
-// Rellena estos valores con los de tu proyecto Firebase
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDOXzUoalwy-nScM1TaHzGGQ7rnoPnquU4",
   authDomain: "vinted-crm-bd15e.firebaseapp.com",
   projectId: "vinted-crm-bd15e",
 };
-// ─────────────────────────────────────────────────────────────────
 
 const initialState = {
   accounts: [
@@ -131,25 +126,19 @@ const initialState = {
   ],
   sales: [],
   stock: [],
+  expenses: [],
 };
 
-let db = null;
-const isConfigured = FIREBASE_CONFIG.apiKey !== "TU_API_KEY";
-
-if (isConfigured) {
-  firebase.initializeApp(FIREBASE_CONFIG);
-  db = firebase.firestore();
-}
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.firestore();
 
 function App() {
   const [state, setState] = useState(null);
   const [tab, setTab] = useState("Dashboard");
   const [syncStatus, setSyncStatus] = useState("syncing");
   const [lastSync, setLastSync] = useState(null);
-  const [setupDone, setSetupDone] = useState(isConfigured);
 
   useEffect(() => {
-    if (!isConfigured) { setState(initialState); setSyncStatus("error"); return; }
     const unsub = db.collection("crm").doc("data").onSnapshot(snap => {
       if (snap.exists) {
         setState(snap.data());
@@ -161,28 +150,23 @@ function App() {
       setLastSync(new Date());
     }, () => setSyncStatus("error"));
     return () => unsub();
-  }, [setupDone]);
+  }, []);
 
-  const update = useCallback(async (fn) => {
-    setState(s => {
-      const ns = typeof fn === "function" ? fn(s) : fn;
-      if (isConfigured) {
-        setSyncStatus("syncing");
-        db.collection("crm").doc("data").set(ns)
-          .then(() => { setSyncStatus("synced"); setLastSync(new Date()); })
-          .catch(() => setSyncStatus("error"));
-      }
+  const update = useCallback((fn) => {
+    setState(prev => {
+      const ns = typeof fn === "function" ? fn(prev) : fn;
+      setSyncStatus("syncing");
+      db.collection("crm").doc("data").set(ns)
+        .then(() => { setSyncStatus("synced"); setLastSync(new Date()); })
+        .catch(() => setSyncStatus("error"));
       return ns;
     });
   }, []);
 
-  if (!setupDone) return <Setup onDone={() => setSetupDone(true)} />;
   if (!state) return (
-    <div className="app">
-      <div className="loading-screen">
-        <div className="spinner" />
-        <div style={{color:"#475569",fontSize:14}}>Conectando con Firebase…</div>
-      </div>
+    <div className="loading-screen">
+      <div className="spinner"/>
+      <div style={{color:"#475569",fontSize:14}}>Conectando con Firebase…</div>
     </div>
   );
 
@@ -206,43 +190,34 @@ function App() {
   const monthRev = monthSales.reduce((a,s)=>a+s.price,0);
   const monthProfit = monthSales.reduce((a,s)=>a+s.profit,0);
   const avgMargin = totalRev>0?(totalProfit/totalRev*100):0;
-  const alerts = (state.stock||[]).filter(i=>i.qty<=(i.alertAt??3));
-  const accountStats = (state.accounts||[]).map(acc=>{
-    const accSales = salesEnriched.filter(s=>s.accountId===acc.id);
-    return {...acc, count:accSales.length, revenue:accSales.reduce((a,s)=>a+s.price,0), profit:accSales.reduce((a,s)=>a+s.profit,0)};
-  }).sort((a,b)=>b.revenue-a.revenue);
 
-  // Gastos
-  const expenses = state.expenses || [];
-  const now2 = new Date();
-  const y = now2.getFullYear(), m = now2.getMonth();
-  
-  // Auto-generar recurrentes del mes actual si no existen
-  const recurrentes = expenses.filter(e => e.recurrent);
-  const yaGenerados = expenses.filter(e => e.generatedFrom);
-  recurrentes.forEach(r => {
-    const yaEste = yaGenerados.some(g => g.generatedFrom === r.id && new Date(g.date).getMonth() === m && new Date(g.date).getFullYear() === y);
-    if (!yaEste) {
-      const auto = { ...r, id: Date.now() + Math.random(), recurrent: false, generatedFrom: r.id, date: `${y}-${String(m+1).padStart(2,'0')}-01` };
-      state = { ...state, expenses: [...(state.expenses||[]), auto] };
-    }
-  });
-
-  const weekExpenses = expenses.filter(e => new Date(e.date) >= weekAgo && !e.recurrent).reduce((a,e)=>a+e.amount,0);
-  const monthExpenses = expenses.filter(e => { const d=new Date(e.date); return d>=monthAgo && !e.recurrent; }).reduce((a,e)=>a+e.amount,0);
-  const totalExpenses = expenses.filter(e=>!e.recurrent).reduce((a,e)=>a+e.amount,0);
+  const expenses = state.expenses||[];
+  const weekExpenses = expenses.filter(e=>new Date(e.date)>=weekAgo).reduce((a,e)=>a+e.amount,0);
+  const monthExpenses = expenses.filter(e=>new Date(e.date)>=monthAgo).reduce((a,e)=>a+e.amount,0);
+  const totalExpenses = expenses.reduce((a,e)=>a+e.amount,0);
   const weekNet = weekProfit - weekExpenses;
   const monthNet = monthProfit - monthExpenses;
   const totalNet = totalProfit - totalExpenses;
 
+  const alerts = (state.stock||[]).filter(i=>i.qty<=(i.alertAt??3));
+
+  const accountStats = (state.accounts||[]).map(acc => {
+    const accSales = salesEnriched.filter(s=>s.accountId===acc.id);
+    return {...acc, count:accSales.length, revenue:accSales.reduce((a,s)=>a+s.price,0), profit:accSales.reduce((a,s)=>a+s.profit,0)};
+  }).sort((a,b)=>b.revenue-a.revenue);
+
   const modelStats = {};
   salesEnriched.forEach(s=>{
     if(!modelStats[s.model]) modelStats[s.model]={count:0,revenue:0,profit:0};
-    modelStats[s.model].count++; modelStats[s.model].revenue+=s.price; modelStats[s.model].profit+=s.profit;
+    modelStats[s.model].count++;
+    modelStats[s.model].revenue+=s.price;
+    modelStats[s.model].profit+=s.profit;
   });
   const topModels = Object.entries(modelStats).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
-  const f = n => n.toFixed(2)+"€";
+
+  const f = n => (n||0).toFixed(2)+"€";
   const syncLabel = syncStatus==="syncing"?"Sincronizando…":syncStatus==="error"?"Sin conexión":lastSync?`Sync ${lastSync.toLocaleTimeString("es",{hour:"2-digit",minute:"2-digit"})}`:"Conectado";
+
   const props = {state,update,salesEnriched,accountStats,topModels,alerts,weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit,avgMargin,f,weekExpenses,monthExpenses,totalExpenses,weekNet,monthNet,totalNet};
 
   return (
@@ -250,13 +225,16 @@ function App() {
       <div className="header">
         <div className="logo-wrap">
           <div className="logo-icon">⚽</div>
-          <div><div className="logo-text">Vinted CRM</div><div className="logo-sub">Panel de control · Camisetas de fútbol</div></div>
+          <div>
+            <div className="logo-text">Vinted CRM</div>
+            <div className="logo-sub">Panel de control · Camisetas de fútbol</div>
+          </div>
         </div>
         <div className="header-right">
           <div className={`sync-badge ${syncStatus==="syncing"?"syncing":syncStatus==="error"?"error":""}`}>
             <div className="sync-dot"/>{syncLabel}
           </div>
-          {alerts.length>0 && <div className="alert-pill">⚠ {alerts.length} alerta{alerts.length>1?"s":""}</div>}
+          {alerts.length>0&&<div className="alert-pill">⚠ {alerts.length} alerta{alerts.length>1?"s":""}</div>}
         </div>
       </div>
       <div className="nav">
@@ -267,44 +245,18 @@ function App() {
         ))}
       </div>
       <div className="content">
-        {tab==="Dashboard" && <Dashboard {...props}/>}
-        {tab==="Ventas" && <Ventas {...props}/>}
-        {tab==="Stock" && <Stock {...props}/>}
-        {tab==="Gastos" && <Gastos {...props}/>}
-        {tab==="Cuentas" && <Cuentas {...props}/>}
-        {tab==="Alertas" && <Alertas {...props}/>}
+        {tab==="Dashboard"&&<Dashboard {...props}/>}
+        {tab==="Ventas"&&<Ventas {...props}/>}
+        {tab==="Stock"&&<Stock {...props}/>}
+        {tab==="Gastos"&&<Gastos {...props}/>}
+        {tab==="Cuentas"&&<Cuentas {...props}/>}
+        {tab==="Alertas"&&<Alertas {...props}/>}
       </div>
     </div>
   );
 }
 
-function Setup({onDone}) {
-  return (
-    <div className="app">
-      <div className="loading-screen">
-        <div className="setup-card">
-          <div className="setup-title">⚙️ Configurar Firebase</div>
-          <div className="setup-sub">
-            Para activar la sincronización en tiempo real necesitas conectar Firebase. Sigue estos pasos:
-            <br/><br/>
-            1. Ve a <a className="setup-link" href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a><br/>
-            2. Crea un proyecto gratuito<br/>
-            3. Activa <strong>Firestore Database</strong> en modo test<br/>
-            4. Ve a Configuración del proyecto → tu app web<br/>
-            5. Copia los valores de <code>firebaseConfig</code><br/>
-            6. Pégalos en el objeto <code>FIREBASE_CONFIG</code> del archivo <code>index.html</code>
-          </div>
-          <div style={{fontSize:12,color:"#334155",background:"#080c14",borderRadius:8,padding:"12px 14px",fontFamily:"monospace",lineHeight:1.8}}>
-            apiKey: "TU_API_KEY"<br/>
-            authDomain: "TU_PROJECT.firebaseapp.com"<br/>
-            projectId: "TU_PROJECT_ID"
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+/* ── DASHBOARD ── */
 function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit,avgMargin,salesEnriched,accountStats,topModels,alerts,f,weekExpenses,monthExpenses,totalExpenses,weekNet,monthNet,totalNet}) {
   const maxRev = accountStats[0]?.revenue||1;
   const maxMod = topModels[0]?.[1]?.count||1;
@@ -316,7 +268,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
           {label:"Esta semana",val:f(weekRev),sub:`Beneficio bruto ${f(weekProfit)}`,cls:"kpi-purple"},
           {label:"Últimos 30 días",val:f(monthRev),sub:`Beneficio bruto ${f(monthProfit)}`,cls:"kpi-purple"},
           {label:"Facturación total",val:f(totalRev),sub:`${salesEnriched.length} ventas`,cls:""},
-          {label:"Beneficio total bruto",val:f(totalProfit),sub:`Margen ${avgMargin.toFixed(1)}%`,cls:"kpi-green"},
+          {label:"Beneficio bruto total",val:f(totalProfit),sub:`Margen ${avgMargin.toFixed(1)}%`,cls:"kpi-green"},
         ].map(k=>(
           <div key={k.label} className="card">
             <div className="kpi-label">{k.label}</div>
@@ -336,7 +288,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
           <div className="kpi-val kpi-red">{f(monthExpenses)}</div>
           <div className="kpi-sub">Neto: <span style={{color:monthNet>=0?"#10b981":"#ef4444",fontWeight:700}}>{f(monthNet)}</span></div>
         </div>
-        <div className="card" style={{border:"1px solid rgba(16,185,129,.2)",background:"rgba(16,185,129,.04)"}}>
+        <div className="card" style={{border:"1px solid rgba(16,185,129,.2)",background:"rgba(16,185,129,.03)"}}>
           <div className="kpi-label">Beneficio neto total</div>
           <div className={`kpi-val ${totalNet>=0?"kpi-green":"kpi-red"}`}>{f(totalNet)}</div>
           <div className="kpi-sub">Gastos totales: {f(totalExpenses)}</div>
@@ -345,7 +297,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
       <div className="g2">
         <div className="card">
           <div className="kpi-label" style={{marginBottom:14}}>Rendimiento por cuenta</div>
-          {accountStats.filter(a=>a.count>0).length===0 && <div className="empty">Sin ventas aún</div>}
+          {accountStats.filter(a=>a.count>0).length===0&&<div className="empty">Sin ventas aún</div>}
           {accountStats.filter(a=>a.count>0).map((a,i)=>(
             <div key={a.id} className="mini-row">
               <div className="mini-label">{["🥇","🥈","🥉"][i]||`${i+1}.`} {a.name}</div>
@@ -356,7 +308,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
         </div>
         <div className="card">
           <div className="kpi-label" style={{marginBottom:14}}>Top modelos vendidos</div>
-          {topModels.length===0 && <div className="empty">Sin ventas aún</div>}
+          {topModels.length===0&&<div className="empty">Sin ventas aún</div>}
           {topModels.map(([model,s],i)=>(
             <div key={model} className="mini-row">
               <div className="mini-label">{i+1}. {model}</div>
@@ -366,7 +318,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
           ))}
         </div>
       </div>
-      {alerts.length>0 && <>
+      {alerts.length>0&&<>
         <div className="sec" style={{marginTop:22}}><span className="sec-dot" style={{background:"#ef4444"}}/>Alertas activas</div>
         {alerts.map(item=>(
           <div key={item.id} className={"alert-box "+(item.qty===0?"ab-red":"ab-yellow")}>
@@ -381,6 +333,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalProfit
   );
 }
 
+/* ── VENTAS ── */
 function Ventas({state,update,salesEnriched,f}) {
   const [form,setForm] = useState({model:"",size:"",price:"",accountId:(state.accounts||[])[0]?.id||"",date:new Date().toISOString().slice(0,10)});
   const [filter,setFilter] = useState("");
@@ -447,7 +400,7 @@ function Ventas({state,update,salesEnriched,f}) {
                 <td style={{fontWeight:700}}>{f(s.price)}</td>
                 <td style={{color:"#f87171"}}>{f(s.cost)}</td>
                 <td><span className={"badge "+(s.profit>=0?"bg-green":"bg-red")}>{f(s.profit)}</span></td>
-                <td><button className="btn btn-del" onClick={()=>update(st=>({...st,sales:(st.sales||[]).filter(x=>x.id!==s.id)}))}>✕</button></td>
+                <td><button className="btn-del" onClick={()=>update(st=>({...st,sales:(st.sales||[]).filter(x=>x.id!==s.id)}))}>✕</button></td>
               </tr>);
             })}</tbody>
           </table>
@@ -457,13 +410,14 @@ function Ventas({state,update,salesEnriched,f}) {
   );
 }
 
+/* ── STOCK ── */
 function Stock({state,update}) {
   const [form,setForm] = useState({model:"",size:"",qty:"",cost:"",alertAt:"3"});
   const [editId,setEditId] = useState(null);
   const [restockId,setRestockId] = useState(null);
   const [restockQty,setRestockQty] = useState("");
   const [restockCost,setRestockCost] = useState("");
-  const f = n=>n.toFixed(2)+"€";
+  const f = n=>(n||0).toFixed(2)+"€";
 
   const handleSave = () => {
     if(!form.model||!form.qty) return;
@@ -533,9 +487,9 @@ function Stock({state,update}) {
                     </div>
                   ):(
                     <div style={{display:"flex",gap:5}}>
-                      <button className="btn btn-edit" onClick={()=>{setForm({model:item.model,size:item.size,qty:String(item.qty),cost:String(item.cost),alertAt:String(item.alertAt??3)});setEditId(item.id);}}>✏️</button>
+                      <button className="btn-edit" onClick={()=>{setForm({model:item.model,size:item.size,qty:String(item.qty),cost:String(item.cost),alertAt:String(item.alertAt??3)});setEditId(item.id);}}>✏️</button>
                       <button className="btn btn-ghost" style={{padding:"4px 10px",fontSize:11,color:"#10b981",borderColor:"rgba(16,185,129,.2)"}} onClick={()=>setRestockId(item.id)}>+</button>
-                      <button className="btn btn-del" onClick={()=>update(s=>({...s,stock:(s.stock||[]).filter(x=>x.id!==item.id)}))}>✕</button>
+                      <button className="btn-del" onClick={()=>update(s=>({...s,stock:(s.stock||[]).filter(x=>x.id!==item.id)}))}>✕</button>
                     </div>
                   )}
                 </td>
@@ -548,6 +502,100 @@ function Stock({state,update}) {
   );
 }
 
+/* ── GASTOS ── */
+function Gastos({state,update,f}) {
+  const [form,setForm] = useState({desc:"",category:"Packaging",amount:"",date:new Date().toISOString().slice(0,10),recurrent:false});
+  const [filter,setFilter] = useState("all");
+  const expenses = state.expenses||[];
+
+  const handleAdd = () => {
+    if(!form.desc||!form.amount) return;
+    const exp = {...form,id:Date.now(),amount:parseFloat(form.amount)};
+    update(s=>({...s,expenses:[exp,...(s.expenses||[])]}));
+    setForm(fv=>({...fv,desc:"",amount:""}));
+  };
+
+  const filtered = filter==="all"?expenses:filter==="recurrent"?expenses.filter(e=>e.recurrent):expenses.filter(e=>!e.recurrent);
+  const totalFiltered = filtered.reduce((a,e)=>a+e.amount,0);
+
+  const byCategory = EXPENSE_CATS.map(cat=>({
+    cat, total: expenses.filter(e=>e.category===cat).reduce((a,e)=>a+e.amount,0)
+  })).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
+  const maxCat = byCategory[0]?.total||1;
+
+  return (
+    <div>
+      <div className="sec"><span className="sec-dot"/>Registrar gasto</div>
+      <div className="card" style={{marginBottom:20}}>
+        <div className="fr3">
+          <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Bolsas packaging x100" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Categoría</label>
+            <select className="fi" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
+              {EXPENSE_CATS.map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="fg"><label className="fl">Importe (€)</label><input className="fi" type="number" placeholder="0.00" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))}/></div>
+        </div>
+        <div className="fr2">
+          <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></div>
+          <div className="fg" style={{display:"flex",alignItems:"center",gap:10,paddingTop:22}}>
+            <input type="checkbox" id="recurrent" checked={form.recurrent} onChange={e=>setForm(f=>({...f,recurrent:e.target.checked}))} style={{width:16,height:16,accentColor:"#6366f1",cursor:"pointer"}}/>
+            <label htmlFor="recurrent" style={{fontSize:13,color:"#94a3b8",cursor:"pointer"}}>Gasto recurrente mensual</label>
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={handleAdd}>+ Añadir gasto</button>
+      </div>
+
+      {byCategory.length>0&&(
+        <>
+          <div className="sec"><span className="sec-dot"/>Por categoría</div>
+          <div className="card" style={{marginBottom:20}}>
+            {byCategory.map(({cat,total})=>(
+              <div key={cat} className="mini-row">
+                <div className="mini-label">{cat}</div>
+                <div className="mini-track"><div className="mini-fill" style={{width:`${(total/maxCat)*100}%`,background:"linear-gradient(90deg,#ef4444,#f97316)"}}/></div>
+                <div className="mini-val">{total.toFixed(0)}€</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="flex-between" style={{marginBottom:12}}>
+        <div className="sec" style={{margin:0}}><span className="sec-dot"/>Historial · {f(totalFiltered)}</div>
+        <div style={{display:"flex",gap:6}}>
+          {[["all","Todos"],["recurrent","Recurrentes"],["one","Puntuales"]].map(([v,l])=>(
+            <button key={v} className={"btn "+(filter===v?"btn-primary":"btn-ghost")} style={{padding:"5px 12px",fontSize:12}} onClick={()=>setFilter(v)}>{l}</button>
+          ))}
+        </div>
+      </div>
+      <div className="card">
+        {filtered.length===0?<div className="empty">No hay gastos registrados</div>:(
+          <table className="tbl">
+            <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th></th></tr></thead>
+            <tbody>{filtered.map(e=>(
+              <tr key={e.id}>
+                <td style={{color:"#334155",fontSize:12}}>{e.date}</td>
+                <td style={{fontWeight:600}}>{e.desc}</td>
+                <td><span className="tag">{e.category}</span></td>
+                <td>
+                  {e.recurrent
+                    ?<span className="badge bg-purple">🔁 Recurrente</span>
+                    :<span className="badge bg-gray">Puntual</span>
+                  }
+                </td>
+                <td style={{color:"#f87171",fontWeight:700}}>{f(e.amount)}</td>
+                <td><button className="btn-del" onClick={()=>update(s=>({...s,expenses:(s.expenses||[]).filter(x=>x.id!==e.id)}))}>✕</button></td>
+              </tr>
+            ))}</tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── CUENTAS ── */
 function Cuentas({state,update,accountStats,f}) {
   const [modal,setModal] = useState(null);
   const [showPw,setShowPw] = useState({});
@@ -584,8 +632,8 @@ function Cuentas({state,update,accountStats,f}) {
                   </div>
                 </div>
                 <div style={{display:"flex",gap:6}}>
-                  <button className="btn btn-edit" onClick={()=>openEdit(a)}>✏️ Editar</button>
-                  <button className="btn btn-del" onClick={()=>update(s=>({...s,accounts:(s.accounts||[]).filter(x=>x.id!==a.id)}))}>✕</button>
+                  <button className="btn-edit" onClick={()=>openEdit(a)}>✏️ Editar</button>
+                  <button className="btn-del" onClick={()=>update(s=>({...s,accounts:(s.accounts||[]).filter(x=>x.id!==a.id)}))}>✕</button>
                 </div>
               </div>
               <div className="g2" style={{gap:10,marginBottom:12}}>
@@ -632,93 +680,7 @@ function Cuentas({state,update,accountStats,f}) {
   );
 }
 
-function Gastos({state,update,f}) {
-  const [form,setForm] = useState({desc:"",category:"Packaging",amount:"",date:new Date().toISOString().slice(0,10),recurrent:false});
-  const [filter,setFilter] = useState("all");
-  const expenses = state.expenses||[];
-
-  const handleAdd = () => {
-    if(!form.desc||!form.amount) return;
-    const exp = {...form,id:Date.now(),amount:parseFloat(form.amount)};
-    update(s=>({...s,expenses:[exp,...(s.expenses||[])]}));
-    setForm(f=>({...f,desc:"",amount:""}));
-  };
-
-  const filtered = filter==="all"?expenses:filter==="recurrent"?expenses.filter(e=>e.recurrent):expenses.filter(e=>!e.recurrent&&!e.generatedFrom);
-  const totalFiltered = filtered.reduce((a,e)=>a+e.amount,0);
-
-  const byCategory = EXPENSE_CATS.map(cat=>({
-    cat, total: expenses.filter(e=>e.category===cat&&!e.recurrent).reduce((a,e)=>a+e.amount,0)
-  })).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
-  const maxCat = byCategory[0]?.total||1;
-
-  return (
-    <div>
-      <div className="sec"><span className="sec-dot"/>Registrar gasto</div>
-      <div className="card" style={{marginBottom:20}}>
-        <div className="fr3">
-          <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Bolsas packaging x100" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
-          <div className="fg"><label className="fl">Categoría</label>
-            <select className="fi" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
-              {EXPENSE_CATS.map(c=><option key={c}>{c}</option>)}
-            </select>
-          </div>
-          <div className="fg"><label className="fl">Importe (€)</label><input className="fi" type="number" placeholder="0.00" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))}/></div>
-        </div>
-        <div className="fr2">
-          <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></div>
-          <div className="fg" style={{display:"flex",alignItems:"center",gap:10,paddingTop:20}}>
-            <input type="checkbox" id="recurrent" checked={form.recurrent} onChange={e=>setForm(f=>({...f,recurrent:e.target.checked}))} style={{width:16,height:16,accentColor:"#6366f1"}}/>
-            <label htmlFor="recurrent" style={{fontSize:13,color:"#94a3b8",cursor:"pointer"}}>Gasto recurrente mensual</label>
-          </div>
-        </div>
-        <button className="btn btn-primary" onClick={handleAdd}>+ Añadir gasto</button>
-      </div>
-
-      {byCategory.length>0&&(
-        <>
-          <div className="sec"><span className="sec-dot"/>Gastos por categoría</div>
-          <div className="card" style={{marginBottom:20}}>
-            {byCategory.map(({cat,total})=>(
-              <div key={cat} className="mini-row">
-                <div className="mini-label">{cat}</div>
-                <div className="mini-track"><div className="mini-fill" style={{width:`${(total/maxCat)*100}%`,background:"linear-gradient(90deg,#ef4444,#f97316)"}}/></div>
-                <div className="mini-val">{total.toFixed(0)}€</div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      <div className="flex-between" style={{marginBottom:12}}>
-        <div className="sec" style={{margin:0}}><span className="sec-dot"/>Historial · {f(totalFiltered)}</div>
-        <div style={{display:"flex",gap:6}}>
-          {[["all","Todos"],["recurrent","Recurrentes"],["one","Puntuales"]].map(([v,l])=>(
-            <button key={v} className={"btn "+(filter===v?"btn-primary":"btn-ghost")} style={{padding:"5px 12px",fontSize:12}} onClick={()=>setFilter(v)}>{l}</button>
-          ))}
-        </div>
-      </div>
-      <div className="card">
-        {filtered.length===0?<div className="empty">No hay gastos registrados</div>:(
-          <table className="tbl">
-            <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th></th></tr></thead>
-            <tbody>{filtered.map(e=>(
-              <tr key={e.id}>
-                <td style={{color:"#334155",fontSize:12}}>{e.date}</td>
-                <td style={{fontWeight:600}}>{e.desc}</td>
-                <td><span className="tag">{e.category}</span></td>
-                <td>{e.recurrent?<span className="badge" style={{background:"rgba(139,92,246,.12)",color:"#a78bfa",border:"1px solid rgba(139,92,246,.25)"}}>🔁 Recurrente</span>:e.generatedFrom?<span className="badge" style={{background:"rgba(56,189,248,.1)",color:"#38bdf8",border:"1px solid rgba(56,189,248,.2)"}}>Auto</span>:<span className="badge" style={{background:"rgba(100,116,139,.1)",color:"#94a3b8",border:"1px solid rgba(100,116,139,.2)"}}>Puntual</span>}</td>
-                <td style={{color:"#f87171",fontWeight:700}}>{f(e.amount)}</td>
-                <td><button className="btn btn-del" onClick={()=>update(s=>({...s,expenses:(s.expenses||[]).filter(x=>x.id!==e.id)}))}>✕</button></td>
-              </tr>
-            ))}</tbody>
-          </table>
-        )}
-      </div>
-    </div>
-  );
-}
-
+/* ── ALERTAS ── */
 function Alertas({alerts,update}) {
   const handleRestock = item=>{
     const qty=prompt(`¿Cuántas unidades añadir a "${item.model}" (${item.size})?`);
@@ -734,7 +696,7 @@ function Alertas({alerts,update}) {
           <div key={item.id} className={"alert-box "+(item.qty===0?"ab-red":"ab-yellow")}>
             <div>
               <div className={"ab-title "+(item.qty===0?"kpi-red":"kpi-yellow")}>{item.qty===0?"🔴 SIN STOCK":"🟡 STOCK BAJO"} — {item.model} · {item.size}</div>
-              <div className="ab-msg">{item.qty} uds · coste {item.cost.toFixed(2)}€ · umbral ≤{item.alertAt??3}</div>
+              <div className="ab-msg">{item.qty} uds · coste {(item.cost||0).toFixed(2)}€ · umbral ≤{item.alertAt??3}</div>
             </div>
             <button className="btn btn-primary" style={{marginLeft:16,flexShrink:0}} onClick={()=>handleRestock(item)}>+ Reponer</button>
           </div>
