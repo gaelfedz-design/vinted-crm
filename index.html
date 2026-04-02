@@ -111,7 +111,7 @@ body{background:#080c14;color:#f1f5f9;font-family:'Inter',sans-serif;-webkit-fon
 const { useState, useEffect, useCallback, useRef } = React;
 
 const TABS = ["Dashboard", "Ventas", "Stock", "Gastos", "Cuentas", "Alertas"];
-const EXPENSE_CATS = ["Packaging", "Transporte", "Publicidad", "Suscripciones", "Compra de stock", "Otro"];
+const EXPENSE_CATS = ["Packaging", "Transporte", "Publicidad", "Suscripciones", "Otro"];
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDOXzUoalwy-nScM1TaHzGGQ7rnoPnquU4",
@@ -599,10 +599,10 @@ function Gastos({state,update,f}) {
 function Cuentas({state,update,accountStats,f}) {
   const [modal,setModal] = useState(null);
   const [showPw,setShowPw] = useState({});
-  const [form,setForm] = useState({name:"",phone:"",email:"",password:""});
+  const [form,setForm] = useState({name:"",phone:"",email:"",password:"",bank:""});
   const [newName,setNewName] = useState("");
 
-  const openEdit = acc=>{setForm({name:acc.name,phone:acc.phone||"",email:acc.email||"",password:acc.password||""});setModal(acc.id);};
+  const openEdit = acc=>{setForm({name:acc.name,phone:acc.phone||"",email:acc.email||"",password:acc.password||"",bank:acc.bank||""});setModal(acc.id);};
   const saveEdit = ()=>{update(s=>({...s,accounts:(s.accounts||[]).map(a=>a.id===modal?{...a,...form}:a)}));setModal(null);};
   const addAccount = ()=>{if(!newName.trim())return;update(s=>({...s,accounts:[...(s.accounts||[]),{id:Date.now(),name:newName.trim(),phone:"",email:"",password:""}]}));setNewName("");};
 
@@ -646,6 +646,7 @@ function Cuentas({state,update,accountStats,f}) {
                 <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
                   {a.phone&&<span className="info-chip">📱 {a.phone}</span>}
                   {a.email&&<span className="info-chip">✉️ {a.email}</span>}
+                  {a.bank&&<span className="info-chip">🏦 {a.bank}</span>}
                   {a.password&&<span className="info-chip">🔒 ••••••</span>}
                 </div>
               )}
@@ -660,6 +661,7 @@ function Cuentas({state,update,accountStats,f}) {
             <div className="fg"><label className="fl">Nombre</label><input className="fi" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></div>
             <div className="fg"><label className="fl">Teléfono</label><input className="fi" placeholder="+34 600 000 000" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))}/></div>
             <div className="fg"><label className="fl">Email</label><input className="fi" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))}/></div>
+            <div className="fg"><label className="fl">Cuenta bancaria (referencia)</label><input className="fi" placeholder="ej. BBVA · 4521" value={form.bank} onChange={e=>setForm(f=>({...f,bank:e.target.value}))}/></div>
             <div className="fg">
               <label className="fl">Contraseña</label>
               <div className="pw-field">
