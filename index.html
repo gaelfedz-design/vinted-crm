@@ -707,7 +707,7 @@ function Gastos({state,update,f}) {
                 <td style={{color:"#334155",fontSize:12}}>{e.date}</td>
                 <td style={{fontWeight:600}}>{e.desc}</td>
                 <td><span className="tag">{e.category}</span></td>
-                <td>{e.recurrent?<span className="badge bg-purple">Recurrente</span>:e.generatedFrom?<span className="badge bg-blue">Auto</span>:<span className="badge" style={{background:"rgba(100,116,139,.1)",color:"#64748b",border:"1px solid rgba(100,116,139,.2)"}}>Puntual</span>}</td>
+                <td>{e.recurrent?<span className="badge" style={{background:"rgba(139,92,246,.12)",color:"#a78bfa",border:"1px solid rgba(139,92,246,.25)"}}>🔁 Recurrente</span>:e.generatedFrom?<span className="badge" style={{background:"rgba(56,189,248,.1)",color:"#38bdf8",border:"1px solid rgba(56,189,248,.2)"}}>Auto</span>:<span className="badge" style={{background:"rgba(100,116,139,.1)",color:"#94a3b8",border:"1px solid rgba(100,116,139,.2)"}}>Puntual</span>}</td>
                 <td style={{color:"#f87171",fontWeight:700}}>{f(e.amount)}</td>
                 <td><button className="btn btn-del" onClick={()=>update(s=>({...s,expenses:(s.expenses||[]).filter(x=>x.id!==e.id)}))}>✕</button></td>
               </tr>
