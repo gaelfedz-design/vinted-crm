@@ -15,135 +15,186 @@ body{background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFo
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:#d1d1d6;border-radius:2px;}
+
+/* LAYOUT */
 .app{min-height:100vh;background:#f5f5f7;}
-.header{background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid #e5e5ea;padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
-.logo-text{font-size:17px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px;}
-.logo-sub{font-size:11px;color:#86868b;margin-top:1px;}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.sync-badge{display:flex;align-items:center;gap:5px;background:#f2f2f7;color:#86868b;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500;}
-.sync-dot{width:5px;height:5px;border-radius:50%;background:#34c759;animation:blink 2s infinite;}
-.sync-badge.syncing .sync-dot{background:#ff9500;animation:blink .5s infinite;}
-.sync-badge.error .sync-dot{background:#ff3b30;animation:none;}
+.header{background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);border-bottom:1px solid #e5e5ea;padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.logo-text{font-size:16px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px;}
+.logo-sub{font-size:10px;color:#86868b;margin-top:1px;}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#34c759;}
+.sync-dot.syncing{background:#ff9500;animation:blink .5s infinite;}
+.sync-dot.error{background:#ff3b30;animation:none;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-.alert-pill{background:#fff3f3;color:#ff3b30;border:1px solid #ffd5d5;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;}
-.nav{background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);border-bottom:1px solid #e5e5ea;padding:0 28px;display:flex;gap:0;}
-.nav-btn{padding:11px 18px;background:none;border:none;color:#86868b;cursor:pointer;font-size:13px;font-weight:500;border-bottom:2px solid transparent;transition:all .15s;font-family:inherit;}
+.alert-pill{background:#fff3f3;color:#ff3b30;border:1px solid #ffd5d5;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;}
+
+/* NAV */
+.nav{background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);border-bottom:1px solid #e5e5ea;display:flex;overflow-x:auto;padding:0 20px;-webkit-overflow-scrolling:touch;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-btn{padding:10px 14px;background:none;border:none;color:#86868b;cursor:pointer;font-size:13px;font-weight:500;border-bottom:2px solid transparent;transition:all .15s;font-family:inherit;white-space:nowrap;flex-shrink:0;}
 .nav-btn.active{color:#1d1d1f;border-bottom-color:#1d1d1f;}
 .nav-btn:hover:not(.active){color:#1d1d1f;}
-.content{padding:24px 28px;max-width:1100px;margin:0 auto;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
-.card{background:#fff;border:1px solid #e5e5ea;border-radius:16px;padding:20px;}
-.card-sm{background:#fff;border:1px solid #e5e5ea;border-radius:12px;padding:14px;}
-.kpi-label{font-size:11px;color:#86868b;font-weight:500;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;}
-.kpi-val{font-size:24px;font-weight:700;color:#1d1d1f;letter-spacing:-.5px;}
-.kpi-sub{font-size:12px;color:#86868b;margin-top:3px;}
-.kpi-green{color:#34c759!important;}
-.kpi-red{color:#ff3b30!important;}
-.kpi-yellow{color:#ff9500!important;}
-.kpi-blue{color:#007aff!important;}
-.sec{font-size:15px;font-weight:600;color:#1d1d1f;margin:20px 0 10px;letter-spacing:-.2px;}
+
+/* CONTENT */
+.content{padding:16px 20px;max-width:1100px;margin:0 auto;}
+
+/* GRID - responsive */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+@media(max-width:900px){.g4{grid-template-columns:1fr 1fr;}.g3{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}.fr2,.fr3{grid-template-columns:1fr!important;}}
+
+/* CARDS */
+.card{background:#fff;border:1px solid #e5e5ea;border-radius:14px;padding:16px;}
+.card-sm{background:#f5f5f7;border-radius:10px;padding:12px;}
+.kpi-label{font-size:10px;color:#86868b;font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.kpi-val{font-size:22px;font-weight:700;color:#1d1d1f;letter-spacing:-.5px;line-height:1;}
+.kpi-sub{font-size:11px;color:#86868b;margin-top:3px;}
+.kpi-green{color:#34c759!important;}.kpi-red{color:#ff3b30!important;}.kpi-yellow{color:#ff9500!important;}.kpi-blue{color:#007aff!important;}
+
+/* SECTION TITLE */
+.sec{font-size:14px;font-weight:600;color:#1d1d1f;margin:18px 0 10px;letter-spacing:-.2px;}
 .sec:first-child{margin-top:0;}
-.divider{border:none;border-top:1px solid #f2f2f7;margin:16px 0;}
-.btn{padding:8px 16px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;font-family:inherit;}
+
+/* BUTTONS */
+.btn{padding:8px 14px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;font-family:inherit;}
 .btn-primary{background:#1d1d1f;color:#fff;}
 .btn-primary:hover{background:#3a3a3c;}
 .btn-ghost{background:#f2f2f7;border:none;color:#1d1d1f;}
 .btn-ghost:hover{background:#e5e5ea;}
-.btn-del{background:transparent;color:#ff3b30;border:1px solid #ffd5d5;padding:4px 10px;font-size:11px;border-radius:8px;cursor:pointer;font-family:inherit;}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:8px;}
+.btn-del{background:transparent;color:#ff3b30;border:1px solid #ffd5d5;padding:4px 9px;font-size:11px;border-radius:7px;cursor:pointer;font-family:inherit;}
 .btn-del:hover{background:#fff3f3;}
-.btn-edit{background:transparent;color:#007aff;border:1px solid #c7e0ff;padding:4px 10px;font-size:11px;border-radius:8px;cursor:pointer;font-family:inherit;}
+.btn-edit{background:transparent;color:#007aff;border:1px solid #c7e0ff;padding:4px 9px;font-size:11px;border-radius:7px;cursor:pointer;font-family:inherit;}
 .btn-edit:hover{background:#f0f7ff;}
-.fl{font-size:12px;color:#86868b;margin-bottom:4px;display:block;font-weight:500;}
-.fi{width:100%;background:#f5f5f7;border:1px solid #e5e5ea;border-radius:10px;padding:9px 12px;color:#1d1d1f;font-size:13px;outline:none;transition:border .15s;font-family:inherit;}
+
+/* FORMS */
+.fl{font-size:11px;color:#86868b;margin-bottom:4px;display:block;font-weight:500;}
+.fi{width:100%;background:#f5f5f7;border:1px solid #e5e5ea;border-radius:9px;padding:9px 11px;color:#1d1d1f;font-size:13px;outline:none;transition:border .15s;font-family:inherit;}
 .fi:focus{border-color:#1d1d1f;background:#fff;}
-.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.fg{margin-bottom:12px;}
-.tbl{width:100%;border-collapse:collapse;font-size:13px;}
-.tbl th{text-align:left;padding:8px 12px;color:#86868b;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #f2f2f7;}
-.tbl td{padding:11px 12px;border-bottom:1px solid #f9f9f9;vertical-align:middle;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.fg{margin-bottom:10px;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:500px;}
+.tbl th{text-align:left;padding:8px 10px;color:#86868b;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #f2f2f7;}
+.tbl td{padding:10px 10px;border-bottom:1px solid #f9f9f9;vertical-align:middle;}
 .tbl tr:last-child td{border-bottom:none;}
 .tbl tbody tr:hover td{background:#fafafa;}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
 .bg-green{background:#e8faf0;color:#34c759;}
 .bg-red{background:#fff3f3;color:#ff3b30;}
 .bg-yellow{background:#fff8ec;color:#ff9500;}
 .bg-blue{background:#f0f7ff;color:#007aff;}
 .bg-purple{background:#f5f0ff;color:#8b5cf6;}
 .bg-gray{background:#f2f2f7;color:#86868b;}
-.tag{display:inline-block;background:#f2f2f7;color:#86868b;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:500;}
-.alert-box{border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.tag{display:inline-block;background:#f2f2f7;color:#86868b;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:500;}
+
+/* ALERT BOXES */
+.alert-box{border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
 .ab-red{background:#fff3f3;border-left:3px solid #ff3b30;}
 .ab-yellow{background:#fff8ec;border-left:3px solid #ff9500;}
 .ab-green{background:#e8faf0;border-left:3px solid #34c759;}
+.ab-blue{background:#f0f7ff;border-left:3px solid #007aff;}
 .ab-title{font-weight:600;font-size:13px;margin-bottom:2px;}
-.ab-msg{font-size:12px;color:#86868b;}
-.pb-track{height:4px;background:#f2f2f7;border-radius:2px;overflow:hidden;margin-top:4px;width:60px;}
+.ab-msg{font-size:11px;color:#86868b;}
+
+/* MISC */
+.pb-track{height:4px;background:#f2f2f7;border-radius:2px;overflow:hidden;margin-top:4px;}
 .pb-fill{height:100%;border-radius:2px;transition:width .3s;}
-.mini-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.mini-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .mini-row:last-child{margin-bottom:0;}
-.mini-label{font-size:12px;color:#86868b;width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.mini-track{flex:1;height:6px;background:#f2f2f7;border-radius:3px;overflow:hidden;}
+.mini-label{font-size:11px;color:#86868b;width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mini-track{flex:1;height:5px;background:#f2f2f7;border-radius:3px;overflow:hidden;}
 .mini-fill{height:100%;border-radius:3px;}
-.mini-val{font-size:12px;color:#1d1d1f;width:55px;text-align:right;flex-shrink:0;font-weight:600;}
-.flex-between{display:flex;justify-content:space-between;align-items:center;}
-.empty{text-align:center;color:#c7c7cc;padding:36px;font-size:13px;}
-.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
-.modal{background:#fff;border-radius:20px;padding:26px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15);}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:20px;letter-spacing:-.3px;}
+.mini-val{font-size:11px;color:#1d1d1f;width:50px;text-align:right;flex-shrink:0;font-weight:600;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.empty{text-align:center;color:#c7c7cc;padding:30px;font-size:13px;}
+.divider{border:none;border-top:1px solid #f2f2f7;margin:12px 0;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px);}
+@media(min-width:600px){.modal-ov{align-items:center;}}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 -4px 40px rgba(0,0,0,.12);}
+@media(min-width:600px){.modal{border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.15);}}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:18px;}
 .pw-field{position:relative;}
-.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#86868b;font-size:14px;}
-.info-chip{display:inline-flex;align-items:center;gap:5px;background:#f5f5f7;border-radius:8px;padding:3px 9px;font-size:11px;color:#86868b;margin:2px;}
-.profit-preview{background:#f5f5f7;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#86868b;display:flex;gap:20px;}
+.pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#86868b;font-size:12px;font-family:inherit;}
+.info-chip{display:inline-flex;align-items:center;gap:4px;background:#f5f5f7;border-radius:7px;padding:3px 8px;font-size:11px;color:#86868b;margin:2px;}
+.profit-preview{background:#f5f5f7;border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;gap:16px;flex-wrap:wrap;}
 .pp-item{display:flex;flex-direction:column;gap:2px;}
-.pp-val{font-size:15px;font-weight:700;color:#1d1d1f;}
-.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;background:#f5f5f7;}
-.spinner{width:28px;height:28px;border:2px solid #e5e5ea;border-top-color:#1d1d1f;border-radius:50%;animation:spin .7s linear infinite;}
+.pp-val{font-size:14px;font-weight:700;color:#1d1d1f;}
+
+/* LOADING */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px;background:#f5f5f7;}
+.spinner{width:26px;height:26px;border:2px solid #e5e5ea;border-top-color:#1d1d1f;border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.stock-group{background:#fff;border:1px solid #e5e5ea;border-radius:14px;margin-bottom:10px;overflow:hidden;}
-.stock-group-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+
+/* STOCK GROUP */
+.stock-group{background:#fff;border:1px solid #e5e5ea;border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.stock-group-header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;gap:8px;}
 .stock-group-header:hover{background:#fafafa;}
-.stock-group-body{border-top:1px solid #f2f2f7;padding:12px 16px;}
-.chevron{font-size:11px;color:#86868b;transition:transform .2s;}
+.stock-group-body{border-top:1px solid #f2f2f7;padding:10px 14px;}
+.chevron{font-size:11px;color:#86868b;transition:transform .2s;flex-shrink:0;}
 .chevron.open{transform:rotate(90deg);}
-.kpi-card-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
+
+/* CAJA */
+.caja-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f9f9f9;gap:8px;}
+.caja-row:last-child{border-bottom:none;}
+.caja-type{display:flex;align-items:center;gap:8px;}
+.caja-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ACCOUNT CARD */
+.acc-header{padding:18px 16px 14px;position:relative;min-height:80px;}
+.acc-body{padding:14px 16px;}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect, useCallback, useRef } = React;
-const TABS = ["Dashboard","Ventas","Stock","Gastos","Cuentas","Alertas"];
+const { useState, useEffect, useCallback } = React;
+
+const TABS = ["Dashboard","Ventas","Pedidos","Stock","Gastos","Caja","Cuentas","Alertas"];
 const EXPENSE_CATS = ["Packaging","Transporte","Publicidad","Suscripciones","Otro"];
+const STOCK_ALERT_THRESHOLD = 30;
+
 const FIREBASE_CONFIG = {
   apiKey:"AIzaSyDOXzUoalwy-nScM1TaHzGGQ7rnoPnquU4",
   authDomain:"vinted-crm-bd15e.firebaseapp.com",
   projectId:"vinted-crm-bd15e",
 };
+
 const initialState = {
   accounts:[
-    {id:1,name:"Cuenta 1",phone:"",email:"",password:"",bank:""},
-    {id:2,name:"Cuenta 2",phone:"",email:"",password:"",bank:""},
+    {id:1,name:"Cuenta 1",phone:"",email:"",password:"",bank:"",desc:"",tag:""},
+    {id:2,name:"Cuenta 2",phone:"",email:"",password:"",bank:"",desc:"",tag:""},
   ],
-  sales:[],stock:[],expenses:[],
-  alertConfig:{low:3,urgent:1},
+  sales:[],stock:[],expenses:[],orders:[],caja:[],
+  alertConfig:{low:5,urgent:2},
+  cajaBalance:0,
 };
+
 firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.firestore();
+
+const f = n => (parseFloat(n)||0).toFixed(2)+"€";
+const fd = d => d ? new Date(d).toLocaleDateString("es",{day:"2-digit",month:"2-digit",year:"2-digit"}) : "—";
 
 function App() {
   const [state,setState] = useState(null);
   const [tab,setTab] = useState("Dashboard");
   const [syncStatus,setSyncStatus] = useState("syncing");
-  const [lastSync,setLastSync] = useState(null);
 
   useEffect(()=>{
     const unsub = db.collection("crm").doc("data").onSnapshot(snap=>{
-      if(snap.exists){ setState(snap.data()); }
-      else { db.collection("crm").doc("data").set(initialState); setState(initialState); }
-      setSyncStatus("synced"); setLastSync(new Date());
+      setState(snap.exists ? {...initialState,...snap.data()} : initialState);
+      if(!snap.exists) db.collection("crm").doc("data").set(initialState);
+      setSyncStatus("synced");
     },()=>setSyncStatus("error"));
     return ()=>unsub();
   },[]);
@@ -153,52 +204,69 @@ function App() {
       const ns = typeof fn==="function"?fn(prev):fn;
       setSyncStatus("syncing");
       db.collection("crm").doc("data").set(ns)
-        .then(()=>{setSyncStatus("synced");setLastSync(new Date());})
+        .then(()=>setSyncStatus("synced"))
         .catch(()=>setSyncStatus("error"));
       return ns;
     });
   },[]);
 
-  if(!state) return (
-    <div className="loading-screen">
-      <div className="spinner"/>
-      <div style={{color:"#86868b",fontSize:13}}>Cargando...</div>
-    </div>
-  );
+  if(!state) return <div className="loading-screen"><div className="spinner"/><div style={{color:"#86868b",fontSize:13}}>Cargando...</div></div>;
+
+  const stock = state.stock||[];
+  const sales = state.sales||[];
+  const orders = state.orders||[];
+  const expenses = state.expenses||[];
+  const caja = state.caja||[];
+
+  const totalStockUnits = stock.reduce((a,i)=>a+i.qty,0);
+  const stockAlert = totalStockUnits < STOCK_ALERT_THRESHOLD;
+
+  // Enrich sales
+  const salesEnriched = sales.map(s=>{
+    const item = stock.find(i=>i.id===s.stockItemId);
+    const cost = item?item.cost:(s.cost||0);
+    return {...s,cost,profit:s.price-cost};
+  });
+
+  // Enrich orders
+  const ordersEnriched = orders.map(o=>{
+    const items = (o.items||[]).map(it=>{
+      const si = stock.find(i=>i.id===it.stockItemId);
+      const cost = si?si.cost:0;
+      return {...it,cost,lineProfit:(it.price-cost)*it.qty};
+    });
+    const totalCost = items.reduce((a,it)=>a+(it.cost*it.qty),0);
+    const grossRevenue = items.reduce((a,it)=>a+it.price*it.qty,0);
+    const discountAmt = o.discount?grossRevenue*(o.discount/100):0;
+    const revenue = grossRevenue - discountAmt;
+    const profit = revenue - totalCost;
+    return {...o,items,totalCost,grossRevenue,discountAmt,revenue,profit};
+  });
+
+  // Unified financials
+  const totalSalesRev = salesEnriched.reduce((a,s)=>a+s.price,0);
+  const totalSalesProfit = salesEnriched.reduce((a,s)=>a+s.profit,0);
+  const totalOrdersRev = ordersEnriched.reduce((a,o)=>a+o.revenue,0);
+  const totalOrdersProfit = ordersEnriched.reduce((a,o)=>a+o.profit,0);
+  const totalRev = totalSalesRev + totalOrdersRev;
+  const totalProfit = totalSalesProfit + totalOrdersProfit;
+  const totalExpenses = expenses.reduce((a,e)=>a+e.amount,0);
+  const totalNet = totalProfit - totalExpenses;
+  const avgMargin = totalRev>0?(totalNet/totalRev*100):0;
 
   const now = new Date();
   const weekAgo = new Date(now-7*86400000);
   const monthAgo = new Date(now-30*86400000);
-  const alertConfig = state.alertConfig||{low:3,urgent:1};
+  const weekRev = [...salesEnriched,...ordersEnriched].filter(s=>new Date(s.date||s.createdAt)>=weekAgo).reduce((a,s)=>a+(s.price||s.revenue||0),0);
+  const monthRev = [...salesEnriched,...ordersEnriched].filter(s=>new Date(s.date||s.createdAt)>=monthAgo).reduce((a,s)=>a+(s.price||s.revenue||0),0);
 
-  const salesEnriched = (state.sales||[]).map(s=>{
-    const item = (state.stock||[]).find(i=>i.model===s.model&&i.size===s.size);
-    const cost = item?item.cost:(s.cost||0);
-    const profit = s.price-cost;
-    return {...s,cost,profit,margin:s.price>0?(profit/s.price)*100:0};
-  });
+  const stockValue = stock.reduce((a,i)=>a+i.qty*i.cost,0);
+  const pendingOrders = ordersEnriched.filter(o=>o.status==="pendiente");
+  const pendingAmount = pendingOrders.reduce((a,o)=>a+o.revenue,0);
 
-  const totalRev = salesEnriched.reduce((a,s)=>a+s.price,0);
-  const totalCost = salesEnriched.reduce((a,s)=>a+s.cost,0);
-  const totalProfit = salesEnriched.reduce((a,s)=>a+s.profit,0);
-  const weekSales = salesEnriched.filter(s=>new Date(s.date)>=weekAgo);
-  const monthSales = salesEnriched.filter(s=>new Date(s.date)>=monthAgo);
-  const weekRev = weekSales.reduce((a,s)=>a+s.price,0);
-  const weekProfit = weekSales.reduce((a,s)=>a+s.profit,0);
-  const monthRev = monthSales.reduce((a,s)=>a+s.price,0);
-  const monthProfit = monthSales.reduce((a,s)=>a+s.profit,0);
-  const avgMargin = totalRev>0?(totalProfit/totalRev*100):0;
-
-  const expenses = state.expenses||[];
-  const totalExpenses = expenses.reduce((a,e)=>a+e.amount,0);
-  const weekExpenses = expenses.filter(e=>new Date(e.date)>=weekAgo).reduce((a,e)=>a+e.amount,0);
-  const monthExpenses = expenses.filter(e=>new Date(e.date)>=monthAgo).reduce((a,e)=>a+e.amount,0);
-  const weekNet = weekProfit-weekExpenses;
-  const monthNet = monthProfit-monthExpenses;
-  const totalNet = totalProfit-totalExpenses;
-
-  const stockAlerts = (state.stock||[]).filter(i=>i.qty<=(alertConfig.low??3));
-  const urgentAlerts = (state.stock||[]).filter(i=>i.qty<=(alertConfig.urgent??1));
+  const cajaEntradas = caja.filter(c=>c.type==="entrada").reduce((a,c)=>a+c.amount,0);
+  const cajaSalidas = caja.filter(c=>c.type==="salida").reduce((a,c)=>a+c.amount,0);
+  const cajaSaldo = cajaEntradas - cajaSalidas;
 
   const accountStats = (state.accounts||[]).map(acc=>{
     const accSales = salesEnriched.filter(s=>s.accountId===acc.id);
@@ -207,43 +275,38 @@ function App() {
 
   const modelStats = {};
   salesEnriched.forEach(s=>{
-    if(!modelStats[s.model]) modelStats[s.model]={count:0,revenue:0,profit:0};
-    modelStats[s.model].count++; modelStats[s.model].revenue+=s.price; modelStats[s.model].profit+=s.profit;
+    if(!modelStats[s.model]) modelStats[s.model]={count:0,revenue:0};
+    modelStats[s.model].count++; modelStats[s.model].revenue+=s.price;
   });
   const topModels = Object.entries(modelStats).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
 
-  const f = n=>(n||0).toFixed(2)+"€";
-  const syncLabel = syncStatus==="syncing"?"Guardando...":syncStatus==="error"?"Sin conexión":lastSync?`${lastSync.toLocaleTimeString("es",{hour:"2-digit",minute:"2-digit"})}`:"";
-
-  const props = {state,update,salesEnriched,accountStats,topModels,stockAlerts,urgentAlerts,alertConfig,weekRev,weekProfit,monthRev,monthProfit,totalRev,totalCost,totalProfit,avgMargin,f,weekExpenses,monthExpenses,totalExpenses,weekNet,monthNet,totalNet};
+  const props = {state,update,salesEnriched,ordersEnriched,accountStats,topModels,stock,expenses,caja,stockAlert,totalStockUnits,totalRev,totalProfit,totalExpenses,totalNet,avgMargin,weekRev,monthRev,totalSalesRev,totalOrdersRev,stockValue,pendingAmount,cajaSaldo,cajaEntradas,cajaSalidas};
 
   return (
     <div className="app">
       <div className="header">
         <div>
           <div className="logo-text">Vinted CRM</div>
-          <div className="logo-sub">Camisetas de fútbol</div>
+          <div className="logo-sub">Panel de control</div>
         </div>
         <div className="header-right">
-          <div className={`sync-badge ${syncStatus}`}>
-            <div className="sync-dot"/>
-            {syncLabel}
-          </div>
-          {urgentAlerts.length>0&&<div className="alert-pill">{urgentAlerts.length} urgente{urgentAlerts.length>1?"s":""}</div>}
+          <div className={`sync-dot ${syncStatus}`}/>
+          {stockAlert&&<div className="alert-pill">Reponer stock</div>}
+          {pendingOrders.length>0&&<div className="alert-pill" style={{background:"#fff8ec",color:"#ff9500",borderColor:"#ffe0a0"}}>{pendingOrders.length} pendiente{pendingOrders.length>1?"s":""}</div>}
         </div>
       </div>
       <div className="nav">
         {TABS.map(t=>(
-          <button key={t} className={"nav-btn"+(tab===t?" active":"")} onClick={()=>setTab(t)}>
-            {t}{t==="Alertas"&&stockAlerts.length>0?` (${stockAlerts.length})`:""}
-          </button>
+          <button key={t} className={"nav-btn"+(tab===t?" active":"")} onClick={()=>setTab(t)}>{t}</button>
         ))}
       </div>
       <div className="content">
         {tab==="Dashboard"&&<Dashboard {...props}/>}
         {tab==="Ventas"&&<Ventas {...props}/>}
+        {tab==="Pedidos"&&<Pedidos {...props}/>}
         {tab==="Stock"&&<Stock {...props}/>}
         {tab==="Gastos"&&<Gastos {...props}/>}
+        {tab==="Caja"&&<Caja {...props}/>}
         {tab==="Cuentas"&&<Cuentas {...props}/>}
         {tab==="Alertas"&&<Alertas {...props}/>}
       </div>
@@ -252,46 +315,60 @@ function App() {
 }
 
 /* ── DASHBOARD ── */
-function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalCost,totalProfit,avgMargin,salesEnriched,accountStats,topModels,urgentAlerts,f,weekExpenses,monthExpenses,totalExpenses,weekNet,monthNet,totalNet}) {
+function Dashboard({totalRev,totalProfit,totalExpenses,totalNet,avgMargin,weekRev,monthRev,totalSalesRev,totalOrdersRev,stockValue,pendingAmount,cajaSaldo,salesEnriched,ordersEnriched,accountStats,topModels,stockAlert,totalStockUnits}) {
   const maxRev = accountStats[0]?.revenue||1;
   const maxMod = topModels[0]?.[1]?.count||1;
+  const totalOps = salesEnriched.length + ordersEnriched.length;
   return (
     <div>
-      <div className="sec">Resumen</div>
-      <div className="g4" style={{marginBottom:12}}>
+      <div className="sec">Resultados</div>
+      <div className="g4" style={{marginBottom:10}}>
         {[
-          {label:"Facturación semana",val:f(weekRev),sub:`Neto ${f(weekNet)}`,valCls:""},
-          {label:"Facturación 30 días",val:f(monthRev),sub:`Neto ${f(monthNet)}`,valCls:""},
-          {label:"Facturación total",val:f(totalRev),sub:`${salesEnriched.length} ventas`,valCls:""},
-          {label:"Beneficio neto total",val:f(totalNet),sub:`Margen ${avgMargin.toFixed(1)}%`,valCls:totalNet>=0?"kpi-green":"kpi-red"},
+          {label:"Facturación semana",val:f(weekRev),sub:"últimos 7 días"},
+          {label:"Facturación 30d",val:f(monthRev),sub:"últimos 30 días"},
+          {label:"Facturación total",val:f(totalRev),sub:`${totalOps} operaciones`},
+          {label:"Beneficio neto",val:f(totalNet),sub:`Margen ${avgMargin.toFixed(1)}%`,cls:totalNet>=0?"kpi-green":"kpi-red"},
         ].map(k=>(
           <div key={k.label} className="card">
             <div className="kpi-label">{k.label}</div>
-            <div className={`kpi-val ${k.valCls}`}>{k.val}</div>
+            <div className={`kpi-val ${k.cls||""}`}>{k.val}</div>
             <div className="kpi-sub">{k.sub}</div>
           </div>
         ))}
       </div>
-      <div className="g3" style={{marginBottom:12}}>
+      <div className="g4" style={{marginBottom:10}}>
         <div className="card">
-          <div className="kpi-label">Coste de stock vendido</div>
-          <div className="kpi-val kpi-red">{f(totalCost)}</div>
-          <div className="kpi-sub">Calculado automáticamente</div>
+          <div className="kpi-label">Ventas Vinted</div>
+          <div className="kpi-val kpi-blue">{f(totalSalesRev)}</div>
+          <div className="kpi-sub">{salesEnriched.length} ventas</div>
         </div>
         <div className="card">
-          <div className="kpi-label">Gastos de estructura</div>
-          <div className="kpi-val kpi-yellow">{f(totalExpenses)}</div>
-          <div className="kpi-sub">Packaging, transporte, etc.</div>
+          <div className="kpi-label">Pedidos directos</div>
+          <div className="kpi-val kpi-purple" style={{color:"#8b5cf6"}}>{f(totalOrdersRev)}</div>
+          <div className="kpi-sub">{ordersEnriched.length} pedidos</div>
         </div>
         <div className="card">
-          <div className="kpi-label">Beneficio bruto total</div>
-          <div className="kpi-val">{f(totalProfit)}</div>
-          <div className="kpi-sub">Antes de gastos de estructura</div>
+          <div className="kpi-label">Stock inmovilizado</div>
+          <div className="kpi-val kpi-yellow">{f(stockValue)}</div>
+          <div className="kpi-sub">{totalStockUnits} uds disponibles</div>
+        </div>
+        <div className="card" style={{border:cajaSaldo>=0?"1px solid #c8f0d8":"1px solid #ffd5d5"}}>
+          <div className="kpi-label">Saldo en caja</div>
+          <div className={`kpi-val ${cajaSaldo>=0?"kpi-green":"kpi-red"}`}>{f(cajaSaldo)}</div>
+          <div className="kpi-sub">{pendingAmount>0?`+${f(pendingAmount)} pendiente`:""}</div>
         </div>
       </div>
+      {stockAlert&&(
+        <div className="alert-box ab-red" style={{marginBottom:10}}>
+          <div>
+            <div className="ab-title kpi-red">Hacer pedido de stock</div>
+            <div className="ab-msg">Tienes {totalStockUnits} unidades totales. El mínimo recomendado es 30.</div>
+          </div>
+        </div>
+      )}
       <div className="g2">
         <div className="card">
-          <div className="sec" style={{marginTop:0,marginBottom:14}}>Cuentas</div>
+          <div className="sec" style={{marginTop:0,marginBottom:12}}>Cuentas Vinted</div>
           {accountStats.filter(a=>a.count>0).length===0&&<div className="empty">Sin ventas aún</div>}
           {accountStats.filter(a=>a.count>0).map((a,i)=>(
             <div key={a.id} className="mini-row">
@@ -302,7 +379,7 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalCost,t
           ))}
         </div>
         <div className="card">
-          <div className="sec" style={{marginTop:0,marginBottom:14}}>Top modelos</div>
+          <div className="sec" style={{marginTop:0,marginBottom:12}}>Top modelos</div>
           {topModels.length===0&&<div className="empty">Sin ventas aún</div>}
           {topModels.map(([model,s],i)=>(
             <div key={model} className="mini-row">
@@ -313,64 +390,46 @@ function Dashboard({weekRev,weekProfit,monthRev,monthProfit,totalRev,totalCost,t
           ))}
         </div>
       </div>
-      {urgentAlerts.length>0&&<>
-        <div className="sec" style={{marginTop:20}}>Alertas urgentes</div>
-        {urgentAlerts.map(item=>(
-          <div key={item.id} className="alert-box ab-red">
-            <div>
-              <div className="ab-title kpi-red">Sin stock — {item.model} · {item.size}</div>
-              <div className="ab-msg">{item.qty} unidades restantes</div>
-            </div>
-          </div>
-        ))}
-      </>}
     </div>
   );
 }
 
-/* ── VENTAS ── */
-function Ventas({state,update,salesEnriched,f}) {
-  const blankForm = {stockItemId:"",price:"",accountId:(state.accounts||[])[0]?.id||"",date:new Date().toISOString().slice(0,10)};
-  const [form,setForm] = useState(blankForm);
+/* ── VENTAS VINTED ── */
+function Ventas({state,update,salesEnriched,stock}) {
+  const blank = {stockItemId:"",price:"",accountId:(state.accounts||[])[0]?.id||"",date:new Date().toISOString().slice(0,10)};
+  const [form,setForm] = useState(blank);
   const [filter,setFilter] = useState("");
   const [editId,setEditId] = useState(null);
   const [editForm,setEditForm] = useState(null);
 
-  const stockOptions = (state.stock||[]).map(i=>({id:i.id,label:`${i.model} — ${i.size}`,model:i.model,size:i.size,cost:i.cost}));
-  const selected = stockOptions.find(o=>o.id===Number(form.stockItemId));
-  const previewProfit = selected&&form.price?parseFloat(form.price)-selected.cost:null;
+  const opts = stock.map(i=>({id:i.id,label:`${i.model} — ${i.size}`,model:i.model,size:i.size,cost:i.cost,qty:i.qty}));
+  const sel = opts.find(o=>o.id===Number(form.stockItemId));
+  const prev = sel&&form.price?parseFloat(form.price)-sel.cost:null;
 
-  const handleAdd = () => {
-    if(!selected||!form.price||!form.accountId) return;
-    const sale = {id:Date.now(),model:selected.model,size:selected.size,price:parseFloat(form.price),accountId:Number(form.accountId),date:form.date};
-    update(s=>({...s,
-      sales:[sale,...(s.sales||[])],
-      stock:(s.stock||[]).map(i=>i.id===selected.id?{...i,qty:Math.max(0,i.qty-1)}:i)
-    }));
-    setForm(blankForm);
+  const handleAdd = ()=>{
+    if(!sel||!form.price) return;
+    if(sel.qty<=0){alert("Sin stock disponible para este modelo/talla.");return;}
+    const sale={id:Date.now(),stockItemId:sel.id,model:sel.model,size:sel.size,price:parseFloat(form.price),accountId:Number(form.accountId),date:form.date,channel:"vinted"};
+    update(s=>({...s,sales:[sale,...(s.sales||[])],stock:(s.stock||[]).map(i=>i.id===sel.id?{...i,qty:Math.max(0,i.qty-1)}:i)}));
+    setForm(blank);
   };
 
-  const handleEditSave = () => {
-    update(s=>({...s,sales:(s.sales||[]).map(x=>x.id===editId?{...x,...editForm,price:parseFloat(editForm.price),accountId:Number(editForm.accountId)}:x)}));
-    setEditId(null); setEditForm(null);
-  };
-
-  const filtered = salesEnriched.filter(s=>!filter||s.model.toLowerCase().includes(filter.toLowerCase())||(state.accounts||[]).find(a=>a.id===s.accountId)?.name.toLowerCase().includes(filter.toLowerCase()));
+  const filtered = salesEnriched.filter(s=>!filter||s.model?.toLowerCase().includes(filter.toLowerCase()));
 
   return (
     <div>
-      <div className="sec">Registrar venta</div>
-      <div className="card" style={{marginBottom:20}}>
+      <div className="sec">Registrar venta Vinted</div>
+      <div className="card" style={{marginBottom:16}}>
         <div className="fr3">
           <div className="fg">
             <label className="fl">Modelo y talla</label>
             <select className="fi" value={form.stockItemId} onChange={e=>setForm(f=>({...f,stockItemId:Number(e.target.value)}))}>
               <option value="">Seleccionar...</option>
-              {stockOptions.map(o=><option key={o.id} value={o.id}>{o.label}</option>)}
+              {opts.filter(o=>o.qty>0).map(o=><option key={o.id} value={o.id}>{o.label} ({o.qty} uds)</option>)}
             </select>
           </div>
           <div className="fg">
-            <label className="fl">Cuenta Vinted</label>
+            <label className="fl">Cuenta</label>
             <select className="fi" value={form.accountId} onChange={e=>setForm(f=>({...f,accountId:Number(e.target.value)}))}>
               {(state.accounts||[]).map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
@@ -385,12 +444,12 @@ function Ventas({state,update,salesEnriched,f}) {
             <label className="fl">Precio de venta (€)</label>
             <input className="fi" type="number" placeholder="0.00" value={form.price} onChange={e=>setForm(f=>({...f,price:e.target.value}))}/>
           </div>
-          <div className="fg" style={{display:"flex",alignItems:"flex-end",paddingBottom:1}}>
-            {selected&&form.price&&(
-              <div className="profit-preview" style={{flex:1,marginBottom:0}}>
-                <div className="pp-item"><span>Coste</span><span className="pp-val kpi-red">{f(selected.cost)}</span></div>
-                <div className="pp-item"><span>Beneficio</span><span className={"pp-val "+(previewProfit>=0?"kpi-green":"kpi-red")}>{f(previewProfit)}</span></div>
-                <div className="pp-item"><span>Margen</span><span className="pp-val">{((previewProfit/parseFloat(form.price))*100).toFixed(1)}%</span></div>
+          <div className="fg">
+            {sel&&form.price&&(
+              <div className="profit-preview">
+                <div className="pp-item"><span style={{fontSize:10,color:"#86868b"}}>Coste</span><span className="pp-val kpi-red">{f(sel.cost)}</span></div>
+                <div className="pp-item"><span style={{fontSize:10,color:"#86868b"}}>Beneficio</span><span className={"pp-val "+(prev>=0?"kpi-green":"kpi-red")}>{f(prev)}</span></div>
+                <div className="pp-item"><span style={{fontSize:10,color:"#86868b"}}>Margen</span><span className="pp-val">{form.price>0?((prev/parseFloat(form.price))*100).toFixed(1):0}%</span></div>
               </div>
             )}
           </div>
@@ -400,45 +459,46 @@ function Ventas({state,update,salesEnriched,f}) {
 
       <div className="flex-between" style={{marginBottom:10}}>
         <div className="sec" style={{margin:0}}>Historial ({filtered.length})</div>
-        <input className="fi" style={{width:200}} placeholder="Buscar..." value={filter} onChange={e=>setFilter(e.target.value)}/>
+        <input className="fi" style={{width:160}} placeholder="Buscar..." value={filter} onChange={e=>setFilter(e.target.value)}/>
       </div>
       <div className="card">
-        {filtered.length===0?<div className="empty">No hay ventas registradas</div>:(
-          <table className="tbl">
-            <thead><tr><th>Fecha</th><th>Modelo</th><th>Talla</th><th>Cuenta</th><th>Precio</th><th>Coste</th><th>Beneficio</th><th></th></tr></thead>
-            <tbody>{filtered.map(s=>{
-              const acc=(state.accounts||[]).find(a=>a.id===s.accountId);
-              return(<tr key={s.id}>
-                <td style={{color:"#86868b",fontSize:12}}>{s.date}</td>
-                <td style={{fontWeight:600}}>{s.model}</td>
-                <td><span className="tag">{s.size}</span></td>
-                <td style={{color:"#86868b"}}>{acc?.name||"—"}</td>
-                <td style={{fontWeight:600}}>{f(s.price)}</td>
-                <td style={{color:"#ff3b30"}}>{f(s.cost)}</td>
-                <td><span className={"badge "+(s.profit>=0?"bg-green":"bg-red")}>{f(s.profit)}</span></td>
-                <td style={{display:"flex",gap:4}}>
-                  <button className="btn-edit" onClick={()=>{setEditId(s.id);setEditForm({price:String(s.price),accountId:s.accountId,date:s.date});}}>Editar</button>
-                  <button className="btn-del" onClick={()=>update(st=>({...st,sales:(st.sales||[]).filter(x=>x.id!==s.id)}))}>Eliminar</button>
-                </td>
-              </tr>);
-            })}</tbody>
-          </table>
-        )}
+        <div className="tbl-wrap">
+          {filtered.length===0?<div className="empty">Sin ventas registradas</div>:(
+            <table className="tbl">
+              <thead><tr><th>Fecha</th><th>Modelo</th><th>Talla</th><th>Cuenta</th><th>Precio</th><th>Coste</th><th>Beneficio</th><th></th></tr></thead>
+              <tbody>{filtered.map(s=>{
+                const acc=(state.accounts||[]).find(a=>a.id===s.accountId);
+                return(<tr key={s.id}>
+                  <td style={{color:"#86868b"}}>{fd(s.date)}</td>
+                  <td style={{fontWeight:600}}>{s.model}</td>
+                  <td><span className="tag">{s.size}</span></td>
+                  <td style={{color:"#86868b"}}>{acc?.name||"—"}</td>
+                  <td style={{fontWeight:600}}>{f(s.price)}</td>
+                  <td style={{color:"#ff3b30"}}>{f(s.cost)}</td>
+                  <td><span className={"badge "+(s.profit>=0?"bg-green":"bg-red")}>{f(s.profit)}</span></td>
+                  <td style={{display:"flex",gap:4}}>
+                    <button className="btn-edit" onClick={()=>{setEditId(s.id);setEditForm({price:String(s.price),accountId:s.accountId,date:s.date});}}>Editar</button>
+                    <button className="btn-del" onClick={()=>update(st=>({...st,sales:(st.sales||[]).filter(x=>x.id!==s.id)}))}>Eliminar</button>
+                  </td>
+                </tr>);
+              })}</tbody>
+            </table>
+          )}
+        </div>
       </div>
-
       {editId&&(
         <div className="modal-ov" onClick={e=>e.target.className==="modal-ov"&&setEditId(null)}>
           <div className="modal">
             <div className="modal-title">Editar venta</div>
-            <div className="fg"><label className="fl">Precio de venta (€)</label><input className="fi" type="number" value={editForm.price} onChange={e=>setEditForm(f=>({...f,price:e.target.value}))}/></div>
-            <div className="fg"><label className="fl">Cuenta Vinted</label>
+            <div className="fg"><label className="fl">Precio (€)</label><input className="fi" type="number" value={editForm.price} onChange={e=>setEditForm(f=>({...f,price:e.target.value}))}/></div>
+            <div className="fg"><label className="fl">Cuenta</label>
               <select className="fi" value={editForm.accountId} onChange={e=>setEditForm(f=>({...f,accountId:Number(e.target.value)}))}>
                 {(state.accounts||[]).map(a=><option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </div>
             <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={editForm.date} onChange={e=>setEditForm(f=>({...f,date:e.target.value}))}/></div>
-            <div style={{display:"flex",gap:8,marginTop:4}}>
-              <button className="btn btn-primary" onClick={handleEditSave}>Guardar</button>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn btn-primary" onClick={()=>{update(s=>({...s,sales:(s.sales||[]).map(x=>x.id===editId?{...x,...editForm,price:parseFloat(editForm.price),accountId:Number(editForm.accountId)}:x)}));setEditId(null);}}>Guardar</button>
               <button className="btn btn-ghost" onClick={()=>setEditId(null)}>Cancelar</button>
             </div>
           </div>
@@ -448,44 +508,187 @@ function Ventas({state,update,salesEnriched,f}) {
   );
 }
 
+/* ── PEDIDOS DIRECTOS ── */
+function Pedidos({state,update,ordersEnriched,stock}) {
+  const [showForm,setShowForm] = useState(false);
+  const [client,setClient] = useState("");
+  const [discount,setDiscount] = useState("");
+  const [notes,setNotes] = useState("");
+  const [date,setDate] = useState(new Date().toISOString().slice(0,10));
+  const [status,setStatus] = useState("pagado");
+  const [items,setItems] = useState([{stockItemId:"",qty:"1",price:""}]);
+
+  const opts = stock.map(i=>({id:i.id,label:`${i.model} — ${i.size}`,cost:i.cost,qty:i.qty}));
+
+  const addItem = ()=>setItems(it=>[...it,{stockItemId:"",qty:"1",price:""}]);
+  const removeItem = idx=>setItems(it=>it.filter((_,i)=>i!==idx));
+  const updateItem = (idx,field,val)=>setItems(it=>it.map((x,i)=>i===idx?{...x,[field]:val}:x));
+
+  const handleSave = ()=>{
+    if(!client||items.some(it=>!it.stockItemId||!it.price)) return;
+    const order = {id:Date.now(),client,discount:parseFloat(discount)||0,notes,date,status,channel:"directo",createdAt:date,
+      items:items.map(it=>({stockItemId:Number(it.stockItemId),qty:parseInt(it.qty)||1,price:parseFloat(it.price)||0}))};
+    update(s=>({...s,
+      orders:[order,...(s.orders||[])],
+      stock:(s.stock||[]).map(i=>{
+        const it = order.items.find(x=>x.stockItemId===i.id);
+        return it?{...i,qty:Math.max(0,i.qty-it.qty)}:i;
+      })
+    }));
+    setClient(""); setDiscount(""); setNotes(""); setItems([{stockItemId:"",qty:"1",price:""}]); setShowForm(false);
+  };
+
+  return (
+    <div>
+      <div className="flex-between" style={{marginBottom:12}}>
+        <div className="sec" style={{margin:0}}>Pedidos directos ({ordersEnriched.length})</div>
+        <button className="btn btn-primary btn-sm" onClick={()=>setShowForm(v=>!v)}>{showForm?"Cancelar":"Nuevo pedido"}</button>
+      </div>
+
+      {showForm&&(
+        <div className="card" style={{marginBottom:16}}>
+          <div className="fr3">
+            <div className="fg"><label className="fl">Cliente</label><input className="fi" placeholder="Nombre o referencia" value={client} onChange={e=>setClient(e.target.value)}/></div>
+            <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={date} onChange={e=>setDate(e.target.value)}/></div>
+            <div className="fg"><label className="fl">Estado</label>
+              <select className="fi" value={status} onChange={e=>setStatus(e.target.value)}>
+                <option value="pagado">Pagado</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="parcial">Parcial</option>
+              </select>
+            </div>
+          </div>
+          <div className="sec" style={{fontSize:13,marginBottom:8}}>Productos</div>
+          {items.map((it,idx)=>(
+            <div key={idx} style={{display:"grid",gridTemplateColumns:"1fr auto auto auto",gap:8,marginBottom:8,alignItems:"flex-end"}}>
+              <div>
+                {idx===0&&<label className="fl">Modelo y talla</label>}
+                <select className="fi" value={it.stockItemId} onChange={e=>updateItem(idx,"stockItemId",Number(e.target.value))}>
+                  <option value="">Seleccionar...</option>
+                  {opts.filter(o=>o.qty>0).map(o=><option key={o.id} value={o.id}>{o.label}</option>)}
+                </select>
+              </div>
+              <div style={{width:60}}>
+                {idx===0&&<label className="fl">Uds</label>}
+                <input className="fi" type="number" min="1" value={it.qty} onChange={e=>updateItem(idx,"qty",e.target.value)}/>
+              </div>
+              <div style={{width:80}}>
+                {idx===0&&<label className="fl">Precio u.</label>}
+                <input className="fi" type="number" placeholder="0.00" value={it.price} onChange={e=>updateItem(idx,"price",e.target.value)}/>
+              </div>
+              <div style={{paddingBottom:1}}>
+                {items.length>1&&<button className="btn-del" onClick={()=>removeItem(idx)}>—</button>}
+              </div>
+            </div>
+          ))}
+          <button className="btn btn-ghost btn-sm" onClick={addItem} style={{marginBottom:12}}>+ Añadir producto</button>
+          <div className="fr2">
+            <div className="fg"><label className="fl">Descuento (%)</label><input className="fi" type="number" placeholder="0" value={discount} onChange={e=>setDiscount(e.target.value)}/></div>
+            <div className="fg"><label className="fl">Notas</label><input className="fi" placeholder="Opcional" value={notes} onChange={e=>setNotes(e.target.value)}/></div>
+          </div>
+          <button className="btn btn-primary" onClick={handleSave}>Guardar pedido</button>
+        </div>
+      )}
+
+      {ordersEnriched.length===0?<div className="card"><div className="empty">Sin pedidos registrados</div></div>:
+        ordersEnriched.map(o=>(
+          <div key={o.id} className="card" style={{marginBottom:8}}>
+            <div className="flex-between" style={{marginBottom:8}}>
+              <div>
+                <span style={{fontWeight:700,fontSize:14}}>{o.client}</span>
+                <span style={{marginLeft:8}}><span className={"badge "+(o.status==="pagado"?"bg-green":o.status==="pendiente"?"bg-red":"bg-yellow")}>{o.status}</span></span>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                <span style={{fontSize:12,color:"#86868b"}}>{fd(o.date)}</span>
+                <button className="btn-del" onClick={()=>update(s=>({...s,orders:(s.orders||[]).filter(x=>x.id!==o.id)}))}>Eliminar</button>
+              </div>
+            </div>
+            <div className="tbl-wrap">
+              <table className="tbl" style={{minWidth:300}}>
+                <thead><tr><th>Modelo</th><th>Talla</th><th>Uds</th><th>Precio u.</th><th>Coste</th><th>Beneficio</th></tr></thead>
+                <tbody>{o.items.map((it,i)=>{
+                  const si = (state.stock||[]).find(x=>x.id===it.stockItemId);
+                  return(<tr key={i}>
+                    <td style={{fontWeight:600}}>{si?.model||"—"}</td>
+                    <td><span className="tag">{si?.size||"—"}</span></td>
+                    <td>{it.qty}</td>
+                    <td>{f(it.price)}</td>
+                    <td style={{color:"#ff3b30"}}>{f(it.cost)}</td>
+                    <td><span className={"badge "+(it.lineProfit>=0?"bg-green":"bg-red")}>{f(it.lineProfit)}</span></td>
+                  </tr>);
+                })}</tbody>
+              </table>
+            </div>
+            <div className="divider"/>
+            <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:12}}>
+              <span>Bruto: <strong>{f(o.grossRevenue)}</strong></span>
+              {o.discount>0&&<span style={{color:"#ff3b30"}}>Dto: -{o.discount}% ({f(o.discountAmt)})</span>}
+              <span>Total: <strong>{f(o.revenue)}</strong></span>
+              <span style={{color:o.profit>=0?"#34c759":"#ff3b30"}}>Beneficio: <strong>{f(o.profit)}</strong></span>
+              {o.notes&&<span style={{color:"#86868b"}}>"{o.notes}"</span>}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  );
+}
+
 /* ── STOCK ── */
-function Stock({state,update,alertConfig}) {
+function Stock({state,update,stock,totalStockUnits,stockAlert}) {
   const [form,setForm] = useState({model:"",size:"",qty:"",cost:"",alertAt:""});
   const [editId,setEditId] = useState(null);
   const [openGroups,setOpenGroups] = useState({});
-  const f = n=>(n||0).toFixed(2)+"€";
+  const [restockId,setRestockId] = useState(null);
+  const [restockQty,setRestockQty] = useState("");
 
   const grouped = {};
-  (state.stock||[]).forEach(i=>{
-    if(!grouped[i.model]) grouped[i.model]=[];
-    grouped[i.model].push(i);
-  });
+  stock.forEach(i=>{if(!grouped[i.model]) grouped[i.model]=[]; grouped[i.model].push(i);});
 
-  const handleSave = () => {
+  const handleSave = ()=>{
     if(!form.model||!form.qty) return;
-    const entry = {...form,qty:parseInt(form.qty),cost:parseFloat(form.cost)||0,alertAt:parseInt(form.alertAt)||(alertConfig?.low||3)};
-    if(editId) {
+    const entry = {model:form.model.trim(),size:form.size.trim(),qty:parseInt(form.qty),cost:parseFloat(form.cost)||0,alertAt:parseInt(form.alertAt)||5};
+    if(!editId){
+      const dup = stock.find(i=>i.model.toLowerCase()===entry.model.toLowerCase()&&i.size.toLowerCase()===entry.size.toLowerCase());
+      if(dup){
+        if(window.confirm(`"${entry.model} — ${entry.size}" ya existe (${dup.qty} uds). ¿Añadir ${entry.qty} unidades más?`)){
+          update(s=>({...s,stock:(s.stock||[]).map(i=>i.id===dup.id?{...i,qty:i.qty+entry.qty}:i)}));
+          setForm({model:"",size:"",qty:"",cost:"",alertAt:""});
+          return;
+        } else return;
+      }
+      update(s=>({...s,stock:[...(s.stock||[]),{...entry,id:Date.now()}]}));
+    } else {
       update(s=>({...s,stock:(s.stock||[]).map(i=>i.id===editId?{...i,...entry}:i)}));
       setEditId(null);
-    } else {
-      update(s=>({...s,stock:[...(s.stock||[]),{...entry,id:Date.now()}]}));
     }
     setForm({model:"",size:"",qty:"",cost:"",alertAt:""});
   };
 
-  const totalVal = (state.stock||[]).reduce((a,i)=>a+i.qty*i.cost,0);
-  const totalUnits = (state.stock||[]).reduce((a,i)=>a+i.qty,0);
+  const handleRestock = id=>{
+    if(!restockQty) return;
+    update(s=>({...s,stock:(s.stock||[]).map(i=>i.id===id?{...i,qty:i.qty+parseInt(restockQty)}:i)}));
+    setRestockId(null); setRestockQty("");
+  };
+
+  const stockValue = stock.reduce((a,i)=>a+i.qty*i.cost,0);
 
   return (
     <div>
-      <div className="g3" style={{marginBottom:16}}>
-        <div className="card"><div className="kpi-label">Unidades totales</div><div className="kpi-val">{totalUnits}</div></div>
-        <div className="card"><div className="kpi-label">Valor del stock</div><div className="kpi-val kpi-yellow">{totalVal.toFixed(2)}€</div></div>
-        <div className="card"><div className="kpi-label">Referencias</div><div className="kpi-val">{(state.stock||[]).length}</div></div>
+      <div className="g3" style={{marginBottom:14}}>
+        <div className="card">
+          <div className="kpi-label">Unidades totales</div>
+          <div className={`kpi-val ${stockAlert?"kpi-red":""}`}>{totalStockUnits}</div>
+          <div className="kpi-sub">{stockAlert?"Hacer pedido":"> 30 uds OK"}</div>
+        </div>
+        <div className="card"><div className="kpi-label">Valor del stock</div><div className="kpi-val kpi-yellow">{f(stockValue)}</div><div className="kpi-sub">coste total inmovilizado</div></div>
+        <div className="card"><div className="kpi-label">Referencias</div><div className="kpi-val">{stock.length}</div><div className="kpi-sub">{Object.keys(grouped).length} modelos</div></div>
       </div>
 
-      <div className="sec">{editId?"Editar artículo":"Añadir al stock"}</div>
-      <div className="card" style={{marginBottom:20}}>
+      {stockAlert&&<div className="alert-box ab-red" style={{marginBottom:12}}><div><div className="ab-title kpi-red">Hacer pedido — stock bajo</div><div className="ab-msg">{totalStockUnits} uds totales disponibles (mínimo 30)</div></div></div>}
+
+      <div className="sec">{editId?"Editar artículo":"Añadir stock"}</div>
+      <div className="card" style={{marginBottom:14}}>
         <div className="fr3">
           <div className="fg"><label className="fl">Modelo</label><input className="fi" placeholder="ej. Real Madrid 2025" value={form.model} onChange={e=>setForm(f=>({...f,model:e.target.value}))}/></div>
           <div className="fg"><label className="fl">Talla</label><input className="fi" placeholder="S / M / L / XL" value={form.size} onChange={e=>setForm(f=>({...f,size:e.target.value}))}/></div>
@@ -493,58 +696,70 @@ function Stock({state,update,alertConfig}) {
         </div>
         <div className="fr2">
           <div className="fg"><label className="fl">Coste unitario (€)</label><input className="fi" type="number" placeholder="0.00" value={form.cost} onChange={e=>setForm(f=>({...f,cost:e.target.value}))}/></div>
-          <div className="fg"><label className="fl">Umbral alerta (deja vacío para usar el global)</label><input className="fi" type="number" placeholder={alertConfig?.low||3} value={form.alertAt} onChange={e=>setForm(f=>({...f,alertAt:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Alerta individual (uds)</label><input className="fi" type="number" placeholder="5" value={form.alertAt} onChange={e=>setForm(f=>({...f,alertAt:e.target.value}))}/></div>
         </div>
         <div style={{display:"flex",gap:8}}>
-          <button className="btn btn-primary" onClick={handleSave}>{editId?"Guardar cambios":"Añadir"}</button>
+          <button className="btn btn-primary" onClick={handleSave}>{editId?"Guardar":"Añadir"}</button>
           {editId&&<button className="btn btn-ghost" onClick={()=>{setEditId(null);setForm({model:"",size:"",qty:"",cost:"",alertAt:""});}}>Cancelar</button>}
         </div>
       </div>
 
       <div className="sec">Inventario</div>
-      {Object.keys(grouped).length===0&&<div className="card"><div className="empty">No hay stock registrado</div></div>}
+      {Object.keys(grouped).length===0&&<div className="card"><div className="empty">Sin stock registrado</div></div>}
       {Object.entries(grouped).map(([model,items])=>{
-        const totalQty = items.reduce((a,i)=>a+i.qty,0);
-        const totalV = items.reduce((a,i)=>a+i.qty*i.cost,0);
-        const isOpen = openGroups[model];
-        const hasAlert = items.some(i=>i.qty<=(alertConfig?.low||3));
-        const hasUrgent = items.some(i=>i.qty<=(alertConfig?.urgent||1));
+        const totalQty=items.reduce((a,i)=>a+i.qty,0);
+        const totalV=items.reduce((a,i)=>a+i.qty*i.cost,0);
+        const isOpen=openGroups[model];
+        const hasLow=items.some(i=>i.qty<=(i.alertAt||5));
         return(
           <div key={model} className="stock-group">
             <div className="stock-group-header" onClick={()=>setOpenGroups(g=>({...g,[model]:!g[model]}))}>
-              <div style={{display:"flex",alignItems:"center",gap:10}}>
-                <div style={{fontWeight:600,fontSize:14}}>{model}</div>
-                {hasUrgent&&<span className="badge bg-red">Urgente</span>}
-                {!hasUrgent&&hasAlert&&<span className="badge bg-yellow">Stock bajo</span>}
+              <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
+                <div style={{fontWeight:600,fontSize:13,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{model}</div>
+                {hasLow&&<span className="badge bg-yellow">Bajo</span>}
+                {totalQty===0&&<span className="badge bg-red">Agotado</span>}
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <div style={{fontSize:12,color:"#86868b"}}>{totalQty} uds · {totalV.toFixed(0)}€</div>
+              <div style={{display:"flex",alignItems:"center",gap:10,flex-shrink:0}}>
+                <div style={{fontSize:11,color:"#86868b",white-space:"nowrap"}}>{totalQty} uds · {totalV.toFixed(0)}€</div>
                 <span className={`chevron ${isOpen?"open":""}`}>›</span>
               </div>
             </div>
             {isOpen&&(
               <div className="stock-group-body">
-                <table className="tbl">
-                  <thead><tr><th>Talla</th><th>Stock</th><th>Coste</th><th>Valor</th><th>Estado</th><th></th></tr></thead>
-                  <tbody>{items.map(item=>{
-                    const pct=Math.min(100,(item.qty/Math.max((item.alertAt||alertConfig?.low||3)*3,9))*100);
-                    const color=item.qty<=(alertConfig?.urgent||1)?"#ff3b30":item.qty<=(item.alertAt||alertConfig?.low||3)?"#ff9500":"#34c759";
-                    return(<tr key={item.id}>
-                      <td><span className="tag">{item.size}</span></td>
-                      <td>
-                        <span style={{fontWeight:700,color}}>{item.qty}</span>
-                        <div className="pb-track"><div className="pb-fill" style={{width:pct+"%",background:color}}/></div>
-                      </td>
-                      <td>{f(item.cost)}</td>
-                      <td style={{color:"#ff9500"}}>{f(item.qty*item.cost)}</td>
-                      <td>{item.qty<=(alertConfig?.urgent||1)?<span className="badge bg-red">Urgente</span>:item.qty<=(item.alertAt||alertConfig?.low||3)?<span className="badge bg-yellow">Bajo</span>:<span className="badge bg-green">OK</span>}</td>
-                      <td style={{display:"flex",gap:4}}>
-                        <button className="btn-edit" onClick={()=>{setForm({model:item.model,size:item.size,qty:String(item.qty),cost:String(item.cost),alertAt:String(item.alertAt||"")});setEditId(item.id);}}>Editar</button>
-                        <button className="btn-del" onClick={()=>update(s=>({...s,stock:(s.stock||[]).filter(x=>x.id!==item.id)}))}>Eliminar</button>
-                      </td>
-                    </tr>);
-                  })}</tbody>
-                </table>
+                <div className="tbl-wrap">
+                  <table className="tbl" style={{minWidth:300}}>
+                    <thead><tr><th>Talla</th><th>Stock</th><th>Coste</th><th>Valor</th><th>Estado</th><th></th></tr></thead>
+                    <tbody>{items.map(item=>{
+                      const pct=Math.min(100,(item.qty/Math.max((item.alertAt||5)*3,9))*100);
+                      const color=item.qty===0?"#ff3b30":item.qty<=(item.alertAt||5)?"#ff9500":"#34c759";
+                      return(<tr key={item.id}>
+                        <td><span className="tag">{item.size}</span></td>
+                        <td>
+                          <span style={{fontWeight:700,color}}>{item.qty}</span>
+                          <div className="pb-track" style={{width:50}}><div className="pb-fill" style={{width:pct+"%",background:color}}/></div>
+                        </td>
+                        <td>{f(item.cost)}</td>
+                        <td style={{color:"#ff9500"}}>{f(item.qty*item.cost)}</td>
+                        <td>{item.qty===0?<span className="badge bg-red">Agotado</span>:item.qty<=(item.alertAt||5)?<span className="badge bg-yellow">Bajo</span>:<span className="badge bg-green">OK</span>}</td>
+                        <td>
+                          {restockId===item.id?(
+                            <div style={{display:"flex",gap:4}}>
+                              <input className="fi" type="number" placeholder="Uds" style={{width:55,padding:"4px 8px",fontSize:12}} value={restockQty} onChange={e=>setRestockQty(e.target.value)}/>
+                              <button className="btn btn-primary btn-sm" onClick={()=>handleRestock(item.id)}>OK</button>
+                              <button className="btn btn-ghost btn-sm" onClick={()=>setRestockId(null)}>✕</button>
+                            </div>
+                          ):(
+                            <div style={{display:"flex",gap:4}}>
+                              <button className="btn-edit" onClick={()=>{setForm({model:item.model,size:item.size,qty:String(item.qty),cost:String(item.cost),alertAt:String(item.alertAt||5)});setEditId(item.id);}}>Editar</button>
+                              <button className="btn-ghost btn-sm" style={{color:"#34c759",fontSize:11,padding:"3px 8px"}} onClick={()=>setRestockId(item.id)}>+Uds</button>
+                              <button className="btn-del" onClick={()=>update(s=>({...s,stock:(s.stock||[]).filter(x=>x.id!==item.id)}))}>Eliminar</button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>);
+                    })}</tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
@@ -555,34 +770,32 @@ function Stock({state,update,alertConfig}) {
 }
 
 /* ── GASTOS ── */
-function Gastos({state,update,f,totalExpenses,weekExpenses,monthExpenses}) {
+function Gastos({state,update,totalExpenses}) {
   const [form,setForm] = useState({desc:"",category:"Packaging",amount:"",date:new Date().toISOString().slice(0,10),recurrent:false});
-  const [filter,setFilter] = useState("all");
   const expenses = state.expenses||[];
+  const now = new Date(); const weekAgo=new Date(now-7*86400000); const monthAgo=new Date(now-30*86400000);
+  const weekExp = expenses.filter(e=>new Date(e.date)>=weekAgo).reduce((a,e)=>a+e.amount,0);
+  const monthExp = expenses.filter(e=>new Date(e.date)>=monthAgo).reduce((a,e)=>a+e.amount,0);
+  const byCat = EXPENSE_CATS.map(cat=>({cat,total:expenses.filter(e=>e.category===cat).reduce((a,e)=>a+e.amount,0)})).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
+  const maxCat = byCat[0]?.total||1;
 
-  const handleAdd = () => {
+  const handleAdd=()=>{
     if(!form.desc||!form.amount) return;
-    const exp = {...form,id:Date.now(),amount:parseFloat(form.amount)};
-    update(s=>({...s,expenses:[exp,...(s.expenses||[])]}));
+    update(s=>({...s,expenses:[{...form,id:Date.now(),amount:parseFloat(form.amount)},...(s.expenses||[])]}));
     setForm(fv=>({...fv,desc:"",amount:""}));
   };
 
-  const filtered = filter==="all"?expenses:filter==="recurrent"?expenses.filter(e=>e.recurrent):expenses.filter(e=>!e.recurrent);
-  const byCategory = EXPENSE_CATS.map(cat=>({cat,total:expenses.filter(e=>e.category===cat).reduce((a,e)=>a+e.amount,0)})).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
-  const maxCat = byCategory[0]?.total||1;
-
   return (
     <div>
-      <div className="g3" style={{marginBottom:16}}>
-        <div className="card"><div className="kpi-label">Esta semana</div><div className="kpi-val kpi-red">{f(weekExpenses)}</div></div>
-        <div className="card"><div className="kpi-label">Últimos 30 días</div><div className="kpi-val kpi-red">{f(monthExpenses)}</div></div>
+      <div className="g3" style={{marginBottom:14}}>
+        <div className="card"><div className="kpi-label">Esta semana</div><div className="kpi-val kpi-red">{f(weekExp)}</div></div>
+        <div className="card"><div className="kpi-label">Últimos 30 días</div><div className="kpi-val kpi-red">{f(monthExp)}</div></div>
         <div className="card"><div className="kpi-label">Total acumulado</div><div className="kpi-val kpi-red">{f(totalExpenses)}</div></div>
       </div>
-
       <div className="sec">Registrar gasto</div>
-      <div className="card" style={{marginBottom:20}}>
+      <div className="card" style={{marginBottom:14}}>
         <div className="fr3">
-          <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Bolsas packaging x100" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Bolsas x100" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
           <div className="fg"><label className="fl">Categoría</label>
             <select className="fi" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
               {EXPENSE_CATS.map(c=><option key={c}>{c}</option>)}
@@ -592,18 +805,17 @@ function Gastos({state,update,f,totalExpenses,weekExpenses,monthExpenses}) {
         </div>
         <div className="fr2">
           <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></div>
-          <div className="fg" style={{display:"flex",alignItems:"center",gap:8,paddingTop:20}}>
-            <input type="checkbox" id="recurrent" checked={form.recurrent} onChange={e=>setForm(f=>({...f,recurrent:e.target.checked}))} style={{width:16,height:16,accentColor:"#1d1d1f",cursor:"pointer"}}/>
-            <label htmlFor="recurrent" style={{fontSize:13,color:"#86868b",cursor:"pointer"}}>Recurrente mensual</label>
+          <div className="fg" style={{display:"flex",alignItems:"center",gap:8,paddingTop:18}}>
+            <input type="checkbox" id="rec" checked={form.recurrent} onChange={e=>setForm(f=>({...f,recurrent:e.target.checked}))} style={{width:15,height:15,accentColor:"#1d1d1f",cursor:"pointer"}}/>
+            <label htmlFor="rec" style={{fontSize:12,color:"#86868b",cursor:"pointer"}}>Recurrente mensual</label>
           </div>
         </div>
         <button className="btn btn-primary" onClick={handleAdd}>Añadir gasto</button>
       </div>
-
-      {byCategory.length>0&&<>
+      {byCat.length>0&&<>
         <div className="sec">Por categoría</div>
-        <div className="card" style={{marginBottom:20}}>
-          {byCategory.map(({cat,total})=>(
+        <div className="card" style={{marginBottom:14}}>
+          {byCat.map(({cat,total})=>(
             <div key={cat} className="mini-row">
               <div className="mini-label">{cat}</div>
               <div className="mini-track"><div className="mini-fill" style={{width:`${(total/maxCat)*100}%`,background:"#ff3b30"}}/></div>
@@ -612,103 +824,183 @@ function Gastos({state,update,f,totalExpenses,weekExpenses,monthExpenses}) {
           ))}
         </div>
       </>}
-
-      <div className="flex-between" style={{marginBottom:10}}>
-        <div className="sec" style={{margin:0}}>Historial</div>
-        <div style={{display:"flex",gap:6}}>
-          {[["all","Todos"],["recurrent","Recurrentes"],["one","Puntuales"]].map(([v,l])=>(
-            <button key={v} className={"btn "+(filter===v?"btn-primary":"btn-ghost")} style={{padding:"5px 12px",fontSize:12}} onClick={()=>setFilter(v)}>{l}</button>
-          ))}
+      <div className="sec">Historial</div>
+      <div className="card">
+        <div className="tbl-wrap">
+          {expenses.length===0?<div className="empty">Sin gastos</div>:(
+            <table className="tbl">
+              <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th></th></tr></thead>
+              <tbody>{expenses.map(e=>(
+                <tr key={e.id}>
+                  <td style={{color:"#86868b"}}>{fd(e.date)}</td>
+                  <td style={{fontWeight:600}}>{e.desc}</td>
+                  <td><span className="tag">{e.category}</span></td>
+                  <td>{e.recurrent?<span className="badge bg-purple">Recurrente</span>:<span className="badge bg-gray">Puntual</span>}</td>
+                  <td style={{color:"#ff3b30",fontWeight:600}}>{f(e.amount)}</td>
+                  <td><button className="btn-del" onClick={()=>update(s=>({...s,expenses:(s.expenses||[]).filter(x=>x.id!==e.id)}))}>Eliminar</button></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ── CAJA ── */
+function Caja({state,update,cajaSaldo,cajaEntradas,cajaSalidas,stockValue,pendingAmount}) {
+  const [form,setForm] = useState({desc:"",type:"entrada",amount:"",date:new Date().toISOString().slice(0,10),cat:"Venta"});
+  const caja = state.caja||[];
+  const CATS_IN = ["Venta Vinted","Pedido directo","Inversión","Otro"];
+  const CATS_OUT = ["Compra stock","Gasto estructura","Retiro personal","Otro"];
+
+  const handleAdd=()=>{
+    if(!form.desc||!form.amount) return;
+    update(s=>({...s,caja:[{...form,id:Date.now(),amount:parseFloat(form.amount)},...(s.caja||[])]}));
+    setForm(fv=>({...fv,desc:"",amount:""}));
+  };
+
+  return (
+    <div>
+      <div className="g4" style={{marginBottom:14}}>
+        <div className="card" style={{border:"1px solid "+(cajaSaldo>=0?"#c8f0d8":"#ffd5d5")}}>
+          <div className="kpi-label">Saldo disponible</div>
+          <div className={`kpi-val ${cajaSaldo>=0?"kpi-green":"kpi-red"}`}>{f(cajaSaldo)}</div>
+          <div className="kpi-sub">dinero en caja</div>
+        </div>
+        <div className="card">
+          <div className="kpi-label">Total entradas</div>
+          <div className="kpi-val kpi-green">{f(cajaEntradas)}</div>
+        </div>
+        <div className="card">
+          <div className="kpi-label">Total salidas</div>
+          <div className="kpi-val kpi-red">{f(cajaSalidas)}</div>
+        </div>
+        <div className="card">
+          <div className="kpi-label">Capital inmovilizado</div>
+          <div className="kpi-val kpi-yellow">{f(stockValue)}</div>
+          <div className="kpi-sub">en stock sin vender</div>
+        </div>
+      </div>
+      {pendingAmount>0&&(
+        <div className="alert-box ab-blue" style={{marginBottom:12}}>
+          <div>
+            <div className="ab-title kpi-blue">Por cobrar</div>
+            <div className="ab-msg">{f(pendingAmount)} en pedidos directos pendientes de pago</div>
+          </div>
+        </div>
+      )}
+      <div className="sec">Registrar movimiento</div>
+      <div className="card" style={{marginBottom:14}}>
+        <div className="fr3">
+          <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Cobro pedido Jordi" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Tipo</label>
+            <select className="fi" value={form.type} onChange={e=>setForm(f=>({...f,type:e.target.value,cat:e.target.value==="entrada"?"Venta Vinted":"Compra stock"}))}>
+              <option value="entrada">Entrada</option>
+              <option value="salida">Salida</option>
+            </select>
+          </div>
+          <div className="fg"><label className="fl">Categoría</label>
+            <select className="fi" value={form.cat} onChange={e=>setForm(f=>({...f,cat:e.target.value}))}>
+              {(form.type==="entrada"?CATS_IN:CATS_OUT).map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="fr2">
+          <div className="fg"><label className="fl">Importe (€)</label><input className="fi" type="number" placeholder="0.00" value={form.amount} onChange={e=>setForm(f=>({...f,amount:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))}/></div>
+        </div>
+        <button className="btn btn-primary" onClick={handleAdd}>Registrar</button>
+      </div>
+      <div className="sec">Movimientos</div>
       <div className="card">
-        {filtered.length===0?<div className="empty">No hay gastos registrados</div>:(
-          <table className="tbl">
-            <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th></th></tr></thead>
-            <tbody>{filtered.map(e=>(
-              <tr key={e.id}>
-                <td style={{color:"#86868b",fontSize:12}}>{e.date}</td>
-                <td style={{fontWeight:600}}>{e.desc}</td>
-                <td><span className="tag">{e.category}</span></td>
-                <td>{e.recurrent?<span className="badge bg-purple">Recurrente</span>:<span className="badge bg-gray">Puntual</span>}</td>
-                <td style={{color:"#ff3b30",fontWeight:600}}>{f(e.amount)}</td>
-                <td><button className="btn-del" onClick={()=>update(s=>({...s,expenses:(s.expenses||[]).filter(x=>x.id!==e.id)}))}>Eliminar</button></td>
-              </tr>
-            ))}</tbody>
-          </table>
-        )}
+        <div className="tbl-wrap">
+          {caja.length===0?<div className="empty">Sin movimientos</div>:(
+            <table className="tbl">
+              <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th>Saldo</th><th></th></tr></thead>
+              <tbody>{(() => {
+                let saldo = 0;
+                return [...caja].reverse().map(c=>{
+                  saldo += c.type==="entrada"?c.amount:-c.amount;
+                  return (
+                    <tr key={c.id}>
+                      <td style={{color:"#86868b"}}>{fd(c.date)}</td>
+                      <td style={{fontWeight:600}}>{c.desc}</td>
+                      <td><span className="tag">{c.cat}</span></td>
+                      <td><span className={"badge "+(c.type==="entrada"?"bg-green":"bg-red")}>{c.type==="entrada"?"Entrada":"Salida"}</span></td>
+                      <td style={{color:c.type==="entrada"?"#34c759":"#ff3b30",fontWeight:600}}>{c.type==="entrada"?"+":"-"}{f(c.amount)}</td>
+                      <td style={{color:saldo>=0?"#34c759":"#ff3b30",fontWeight:600}}>{f(saldo)}</td>
+                      <td><button className="btn-del" onClick={()=>update(s=>({...s,caja:(s.caja||[]).filter(x=>x.id!==c.id)}))}>Eliminar</button></td>
+                    </tr>
+                  );
+                });
+              })()}</tbody>
+            </table>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 /* ── CUENTAS ── */
-function Cuentas({state,update,accountStats,f}) {
+function Cuentas({state,update,accountStats}) {
   const [modal,setModal] = useState(null);
   const [showPw,setShowPw] = useState({});
   const [form,setForm] = useState({name:"",phone:"",email:"",password:"",bank:"",desc:"",tag:""});
   const [newName,setNewName] = useState("");
 
+  const tagToGrad = tag=>{
+    const pals=[["#1a1a2e","#16213e"],["#0f2027","#203a43"],["#1a0533","#2d1b4e"],["#0d1b2a","#1b2838"],["#1c1c1e","#2c2c2e"],["#0a1628","#1e3a5f"],["#1a1a1a","#2d2d2d"],["#0d2137","#1a3a5c"],["#1f1b2e","#352b57"],["#0f1923","#1a2f44"]];
+    if(!tag) return `linear-gradient(135deg,${pals[0][0]},${pals[0][1]})`;
+    let h=0; for(let i=0;i<tag.length;i++) h=tag.charCodeAt(i)+((h<<5)-h);
+    const idx=Math.abs(h)%pals.length;
+    return `linear-gradient(135deg,${pals[idx][0]},${pals[idx][1]})`;
+  };
+
   const openEdit = acc=>{setForm({name:acc.name,phone:acc.phone||"",email:acc.email||"",password:acc.password||"",bank:acc.bank||"",desc:acc.desc||"",tag:acc.tag||""});setModal(acc.id);};
   const saveEdit = ()=>{update(s=>({...s,accounts:(s.accounts||[]).map(a=>a.id===modal?{...a,...form}:a)}));setModal(null);};
   const addAccount = ()=>{if(!newName.trim())return;update(s=>({...s,accounts:[...(s.accounts||[]),{id:Date.now(),name:newName.trim(),phone:"",email:"",password:"",bank:"",desc:"",tag:""}]}));setNewName("");};
 
-  // Genera un gradiente único y consistente a partir del tag de texto
-  const tagToGradient = (tag) => {
-    const palettes = [
-      ["#1a1a2e","#16213e"],["#0f2027","#203a43"],["#1a0533","#2d1b4e"],
-      ["#0d1b2a","#1b2838"],["#1c1c1e","#2c2c2e"],["#0a1628","#1e3a5f"],
-      ["#1a1a1a","#2d2d2d"],["#0d2137","#1a3a5c"],["#1f1b2e","#352b57"],
-      ["#0f1923","#1a2f44"],
-    ];
-    if(!tag) return `linear-gradient(135deg, ${palettes[0][0]}, ${palettes[0][1]})`;
-    let hash = 0;
-    for(let i=0;i<tag.length;i++) hash = tag.charCodeAt(i)+((hash<<5)-hash);
-    const idx = Math.abs(hash)%palettes.length;
-    return `linear-gradient(135deg, ${palettes[idx][0]}, ${palettes[idx][1]})`;
-  };
-
   return (
     <div>
       <div className="sec">Nueva cuenta</div>
-      <div className="card" style={{marginBottom:20}}>
+      <div className="card" style={{marginBottom:14}}>
         <div style={{display:"flex",gap:8}}>
-          <input className="fi" style={{flex:1}} placeholder="Nombre de la cuenta..." value={newName} onChange={e=>setNewName(e.target.value)}/>
+          <input className="fi" style={{flex:1}} placeholder="Nombre..." value={newName} onChange={e=>setNewName(e.target.value)}/>
           <button className="btn btn-primary" onClick={addAccount}>Añadir</button>
         </div>
       </div>
-      <div className="sec">Tus cuentas</div>
+      <div className="sec">Cuentas Vinted</div>
       <div className="g2">
         {accountStats.map((a,i)=>{
-          const margin = a.revenue>0?(a.profit/a.revenue*100):0;
-          const grad = tagToGradient(a.tag);
+          const margin=a.revenue>0?(a.profit/a.revenue*100):0;
           return(
             <div key={a.id} className="card" style={{padding:0,overflow:"hidden"}}>
-              {/* Cabecera visual */}
-              <div style={{background:grad,padding:"22px 20px 18px",position:"relative",minHeight:90}}>
-                <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.15)",borderRadius:"16px 16px 0 0"}}/>
+              <div style={{background:tagToGrad(a.tag),padding:"18px 16px 14px",position:"relative",minHeight:76}}>
+                <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.15)",borderRadius:"14px 14px 0 0"}}/>
                 <div style={{position:"relative",zIndex:1}}>
-                  {a.tag&&<div style={{fontSize:10,fontWeight:600,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:4}}>{a.tag}</div>}
-                  <div style={{fontWeight:700,fontSize:17,color:"#fff",letterSpacing:"-.3px"}}>{a.name}</div>
-                  {a.desc&&<div style={{fontSize:12,color:"rgba(255,255,255,.65)",marginTop:4,lineHeight:1.4}}>{a.desc}</div>}
+                  {a.tag&&<div style={{fontSize:9,fontWeight:600,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:"1px",marginBottom:3}}>{a.tag}</div>}
+                  <div style={{fontWeight:700,fontSize:15,color:"#fff"}}>{a.name}</div>
+                  {a.desc&&<div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginTop:3}}>{a.desc}</div>}
                 </div>
               </div>
-              {/* Cuerpo */}
-              <div style={{padding:"16px 20px"}}>
-                <div className="flex-between" style={{marginBottom:14}}>
-                  <div style={{fontSize:11,color:"#86868b"}}>#{i+1} por facturación</div>
+              <div style={{padding:"12px 16px"}}>
+                <div className="flex-between" style={{marginBottom:10}}>
+                  <div style={{fontSize:10,color:"#86868b"}}>#{i+1} por facturación</div>
                   <div style={{display:"flex",gap:6}}>
                     <button className="btn-edit" onClick={()=>openEdit(a)}>Editar</button>
                     <button className="btn-del" onClick={()=>update(s=>({...s,accounts:(s.accounts||[]).filter(x=>x.id!==a.id)}))}>Eliminar</button>
                   </div>
                 </div>
-                <div className="g2" style={{gap:8,marginBottom:12}}>
-                  <div className="card-sm"><div className="kpi-label">Ventas</div><div style={{fontSize:18,fontWeight:700}}>{a.count}</div></div>
-                  <div className="card-sm"><div className="kpi-label">Facturación</div><div style={{fontSize:18,fontWeight:700}}>{f(a.revenue)}</div></div>
-                  <div className="card-sm"><div className="kpi-label">Beneficio</div><div style={{fontSize:16,fontWeight:700,color:"#34c759"}}>{f(a.profit)}</div></div>
-                  <div className="card-sm"><div className="kpi-label">Margen</div><div style={{fontSize:16,fontWeight:700,color:margin>20?"#34c759":"#ff9500"}}>{margin.toFixed(1)}%</div></div>
+                <div className="g2" style={{gap:8,marginBottom:10}}>
+                  <div className="card-sm"><div className="kpi-label">Ventas</div><div style={{fontSize:16,fontWeight:700}}>{a.count}</div></div>
+                  <div className="card-sm"><div className="kpi-label">Facturación</div><div style={{fontSize:16,fontWeight:700}}>{f(a.revenue)}</div></div>
+                  <div className="card-sm"><div className="kpi-label">Beneficio</div><div style={{fontSize:14,fontWeight:700,color:"#34c759"}}>{f(a.profit)}</div></div>
+                  <div className="card-sm"><div className="kpi-label">Margen</div><div style={{fontSize:14,fontWeight:700,color:margin>20?"#34c759":"#ff9500"}}>{margin.toFixed(1)}%</div></div>
                 </div>
-                {(a.phone||a.email||a.bank||a.password)&&(
+                {(a.phone||a.bank||a.password)&&(
                   <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
                     {a.phone&&<span className="info-chip">{a.phone}</span>}
                     {a.bank&&<span className="info-chip">Banco: {a.bank}</span>}
@@ -723,12 +1015,13 @@ function Cuentas({state,update,accountStats,f}) {
       {modal&&(
         <div className="modal-ov" onClick={e=>e.target.className==="modal-ov"&&setModal(null)}>
           <div className="modal">
-            <div className="fg"><label className="fl">Etiqueta visual (1-3 palabras, genera el fondo)</label><input className="fi" placeholder="ej. Principal · Activa · Test" value={form.tag} onChange={e=>setForm(f=>({...f,tag:e.target.value}))}/></div>
-            <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Cuenta principal de ventas de temporada" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
+            <div className="modal-title">Editar cuenta</div>
+            <div className="fg"><label className="fl">Etiqueta visual (1-3 palabras)</label><input className="fi" placeholder="ej. Principal · Activa" value={form.tag} onChange={e=>setForm(f=>({...f,tag:e.target.value}))}/></div>
+            <div className="fg"><label className="fl">Descripción</label><input className="fi" placeholder="ej. Cuenta principal temporada verano" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></div>
             <div className="fg"><label className="fl">Nombre</label><input className="fi" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></div>
             <div className="fg"><label className="fl">Teléfono</label><input className="fi" placeholder="+34 600 000 000" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))}/></div>
             <div className="fg"><label className="fl">Email</label><input className="fi" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))}/></div>
-            <div className="fg"><label className="fl">Cuenta bancaria (referencia)</label><input className="fi" placeholder="ej. BBVA · 4521" value={form.bank} onChange={e=>setForm(f=>({...f,bank:e.target.value}))}/></div>
+            <div className="fg"><label className="fl">Cuenta bancaria</label><input className="fi" placeholder="ej. BBVA · 4521" value={form.bank} onChange={e=>setForm(f=>({...f,bank:e.target.value}))}/></div>
             <div className="fg">
               <label className="fl">Contraseña</label>
               <div className="pw-field">
@@ -750,12 +1043,13 @@ function Cuentas({state,update,accountStats,f}) {
 }
 
 /* ── ALERTAS ── */
-function Alertas({state,update,stockAlerts,urgentAlerts,alertConfig}) {
-  const [cfg,setCfg] = useState({low:alertConfig?.low||3,urgent:alertConfig?.urgent||1});
+function Alertas({state,update,stockAlert,totalStockUnits}) {
+  const [cfg,setCfg] = useState({low:state.alertConfig?.low||5,urgent:state.alertConfig?.urgent||2});
+  const stock = state.stock||[];
+  const lowItems = stock.filter(i=>i.qty<=(i.alertAt||cfg.low)&&i.qty>0);
+  const outItems = stock.filter(i=>i.qty===0);
 
-  const saveConfig = ()=>{
-    update(s=>({...s,alertConfig:{low:parseInt(cfg.low),urgent:parseInt(cfg.urgent)}}));
-  };
+  const saveConfig=()=>update(s=>({...s,alertConfig:{low:parseInt(cfg.low),urgent:parseInt(cfg.urgent)}}));
 
   const handleRestock = item=>{
     const qty=prompt(`¿Cuántas unidades añadir a "${item.model}" (${item.size})?`);
@@ -765,48 +1059,48 @@ function Alertas({state,update,stockAlerts,urgentAlerts,alertConfig}) {
 
   return (
     <div>
-      <div className="sec">Configuración global de alertas</div>
-      <div className="card" style={{marginBottom:20}}>
-        <div className="fr2">
-          <div className="fg">
-            <label className="fl">Alerta "Stock bajo" cuando queden ≤ unidades</label>
-            <input className="fi" type="number" value={cfg.low} onChange={e=>setCfg(c=>({...c,low:e.target.value}))}/>
+      <div className="sec">Alerta global de pedido</div>
+      <div className={`alert-box ${stockAlert?"ab-red":"ab-green"}`} style={{marginBottom:14}}>
+        <div>
+          <div className={`ab-title ${stockAlert?"kpi-red":"kpi-green"}`}>
+            {stockAlert?"Hacer pedido de stock ahora":"Stock suficiente"}
           </div>
-          <div className="fg">
-            <label className="fl">Alerta "Pedido urgente" cuando queden ≤ unidades</label>
-            <input className="fi" type="number" value={cfg.urgent} onChange={e=>setCfg(c=>({...c,urgent:e.target.value}))}/>
-          </div>
+          <div className="ab-msg">{totalStockUnits} unidades totales disponibles · Mínimo: 30 unidades</div>
         </div>
-        <button className="btn btn-primary" onClick={saveConfig}>Guardar configuración</button>
       </div>
 
-      <div className="sec">Pedido urgente ({urgentAlerts.length})</div>
-      {urgentAlerts.length===0
-        ?<div className="alert-box ab-green"><div><div className="ab-title" style={{color:"#34c759"}}>Todo en orden</div><div className="ab-msg">No hay artículos en estado urgente.</div></div></div>
-        :urgentAlerts.map(item=>(
-          <div key={item.id} className="alert-box ab-red">
-            <div>
-              <div className="ab-title kpi-red">{item.model} · Talla {item.size}</div>
-              <div className="ab-msg">{item.qty} unidades · coste {(item.cost||0).toFixed(2)}€</div>
-            </div>
-            <button className="btn btn-primary" style={{marginLeft:16,flexShrink:0}} onClick={()=>handleRestock(item)}>Reponer</button>
-          </div>
-        ))
-      }
+      <div className="sec">Configuración de alertas individuales</div>
+      <div className="card" style={{marginBottom:14}}>
+        <div className="fr2">
+          <div className="fg"><label className="fl">Alerta "Stock bajo" (≤ uds por referencia)</label><input className="fi" type="number" value={cfg.low} onChange={e=>setCfg(c=>({...c,low:e.target.value}))}/></div>
+          <div className="fg"><label className="fl">Alerta "Urgente" (≤ uds por referencia)</label><input className="fi" type="number" value={cfg.urgent} onChange={e=>setCfg(c=>({...c,urgent:e.target.value}))}/></div>
+        </div>
+        <button className="btn btn-primary" onClick={saveConfig}>Guardar</button>
+      </div>
 
-      <div className="sec" style={{marginTop:20}}>Stock bajo ({stockAlerts.filter(i=>i.qty>(alertConfig?.urgent||1)).length})</div>
-      {stockAlerts.filter(i=>i.qty>(alertConfig?.urgent||1)).length===0
-        ?<div className="alert-box ab-green"><div><div className="ab-title" style={{color:"#34c759"}}>Todo en orden</div><div className="ab-msg">No hay artículos con stock bajo.</div></div></div>
-        :stockAlerts.filter(i=>i.qty>(alertConfig?.urgent||1)).map(item=>(
-          <div key={item.id} className="alert-box ab-yellow">
-            <div>
-              <div className="ab-title kpi-yellow">{item.model} · Talla {item.size}</div>
-              <div className="ab-msg">{item.qty} unidades · coste {(item.cost||0).toFixed(2)}€</div>
-            </div>
-            <button className="btn btn-primary" style={{marginLeft:16,flexShrink:0}} onClick={()=>handleRestock(item)}>Reponer</button>
+      {outItems.length>0&&<>
+        <div className="sec">Agotados ({outItems.length})</div>
+        {outItems.map(item=>(
+          <div key={item.id} className="alert-box ab-red">
+            <div><div className="ab-title kpi-red">{item.model} · {item.size}</div><div className="ab-msg">Sin stock</div></div>
+            <button className="btn btn-primary btn-sm" onClick={()=>handleRestock(item)}>Reponer</button>
           </div>
-        ))
-      }
+        ))}
+      </>}
+
+      {lowItems.length>0&&<>
+        <div className="sec">Stock bajo ({lowItems.length})</div>
+        {lowItems.map(item=>(
+          <div key={item.id} className="alert-box ab-yellow">
+            <div><div className="ab-title kpi-yellow">{item.model} · {item.size}</div><div className="ab-msg">{item.qty} uds · coste {f(item.cost)}</div></div>
+            <button className="btn btn-primary btn-sm" onClick={()=>handleRestock(item)}>Reponer</button>
+          </div>
+        ))}
+      </>}
+
+      {outItems.length===0&&lowItems.length===0&&(
+        <div className="alert-box ab-green"><div><div className="ab-title" style={{color:"#34c759"}}>Todo en orden</div><div className="ab-msg">No hay referencias con stock bajo.</div></div></div>
+      )}
     </div>
   );
 }
