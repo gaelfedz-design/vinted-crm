@@ -719,8 +719,8 @@ function Stock({state,update,stock,totalStockUnits,stockAlert}) {
                 {hasLow&&<span className="badge bg-yellow">Bajo</span>}
                 {totalQty===0&&<span className="badge bg-red">Agotado</span>}
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:10,flex-shrink:0}}>
-                <div style={{fontSize:11,color:"#86868b",white-space:"nowrap"}}>{totalQty} uds · {totalV.toFixed(0)}€</div>
+              <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+                <div style={{fontSize:11,color:"#86868b",whiteSpace:"nowrap"}}>{totalQty} uds · {totalV.toFixed(0)}€</div>
                 <span className={`chevron ${isOpen?"open":""}`}>›</span>
               </div>
             </div>
