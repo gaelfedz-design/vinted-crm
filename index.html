@@ -148,30 +148,53 @@ function App(){
   const stock=st.stock||[], sales=st.sales||[], orders=st.orders||[], expenses=st.expenses||[], caja=st.caja||[];
   const totalUnits=stock.reduce((a,i)=>a+i.qty,0);
   const stockAlert=totalUnits<STOCK_MIN;
-  const se=sales.map(s=>{const it=stock.find(i=>i.id===s.stockItemId);const cost=it?it.cost:(s.cost||0);return{...s,cost,profit:s.price-cost};});
+  const se=sales.map(s=>{
+    // Busca coste por stockItemId primero, luego por modelo+talla como fallback
+    const it=stock.find(i=>i.id===s.stockItemId) || stock.find(i=>i.model===s.model&&i.size===s.size);
+    const cost=it?it.cost:(s.cost||0);
+    const profit=s.price-cost;
+    return{...s,cost,profit};
+  });
   const oe=orders.map(o=>{
-    const items=(o.items||[]).map(it=>{const si=stock.find(i=>i.id===it.stockItemId);const cost=si?si.cost:0;return{...it,cost,lp:(it.price-cost)*it.qty};});
+    const items=(o.items||[]).map(it=>{
+      const si=stock.find(i=>i.id===it.stockItemId);
+      const cost=si?si.cost:0;
+      const lp=(it.price-cost)*it.qty;
+      return{...it,cost,lp};
+    });
     const gr=items.reduce((a,it)=>a+it.price*it.qty,0);
     const da=o.discount?gr*(o.discount/100):0;
     const rev=gr-da;
     const tc=items.reduce((a,it)=>a+it.cost*it.qty,0);
-    return{...o,items,gr,da,rev,profit:rev-tc};
+    const profit=rev-tc;
+    return{...o,items,gr,da,rev,profit};
   });
   const now=new Date(),wa=new Date(now-7*86400000),ma=new Date(now-30*86400000);
   const totalRev=se.reduce((a,s)=>a+s.price,0)+oe.reduce((a,o)=>a+o.rev,0);
-  const totalProfit=se.reduce((a,s)=>a+s.profit,0)+oe.reduce((a,o)=>a+o.profit,0);
+  const totalCost=se.reduce((a,s)=>a+s.cost,0)+oe.reduce((a,o)=>a+o.items.reduce((b,it)=>b+it.cost*it.qty,0),0);
+  const totalProfit=totalRev-totalCost; // Beneficio bruto real
   const totalExp=expenses.reduce((a,e)=>a+e.amount,0);
-  const totalNet=totalProfit-totalExp;
+  const totalNet=totalProfit-totalExp; // Beneficio neto real
   const avgM=totalRev>0?(totalNet/totalRev*100):0;
   const allOps=[...se,...oe];
   const weekOps=allOps.filter(s=>new Date(s.date||s.createdAt)>=wa);
   const monthOps=allOps.filter(s=>new Date(s.date||s.createdAt)>=ma);
   const weekRev=weekOps.reduce((a,s)=>a+(s.price||s.rev||0),0);
   const monthRev=monthOps.reduce((a,s)=>a+(s.price||s.rev||0),0);
-  const weekProfit=weekOps.reduce((a,s)=>a+(s.profit||0),0);
-  const monthProfit=monthOps.reduce((a,s)=>a+(s.profit||0),0);
+  const weekSales=se.filter(s=>new Date(s.date)>=wa);
+  const monthSales=se.filter(s=>new Date(s.date)>=ma);
+  const weekOrders=oe.filter(o=>new Date(o.createdAt)>=wa);
+  const monthOrders=oe.filter(o=>new Date(o.createdAt)>=ma);
+  const weekRev=weekSales.reduce((a,s)=>a+s.price,0)+weekOrders.reduce((a,o)=>a+o.rev,0);
+  const monthRev=monthSales.reduce((a,s)=>a+s.price,0)+monthOrders.reduce((a,o)=>a+o.rev,0);
+  const weekCost=weekSales.reduce((a,s)=>a+s.cost,0)+weekOrders.reduce((a,o)=>a+o.items.reduce((b,it)=>b+it.cost*it.qty,0),0);
+  const monthCost=monthSales.reduce((a,s)=>a+s.cost,0)+monthOrders.reduce((a,o)=>a+o.items.reduce((b,it)=>b+it.cost*it.qty,0),0);
+  const weekProfit=weekRev-weekCost;
+  const monthProfit=monthRev-monthCost;
   const weekExp=expenses.filter(e=>new Date(e.date)>=wa).reduce((a,e)=>a+e.amount,0);
   const monthExp=expenses.filter(e=>new Date(e.date)>=ma).reduce((a,e)=>a+e.amount,0);
+  const weekNet=weekProfit-weekExp;
+  const monthNet=monthProfit-monthExp;
   const weekNet=weekProfit-weekExp;
   const monthNet=monthProfit-monthExp;
   const stockVal=stock.reduce((a,i)=>a+i.qty*i.cost,0);
@@ -182,7 +205,7 @@ function App(){
   const accStats=(st.accounts||[]).map(acc=>{const as=se.filter(s=>s.accountId===acc.id);return{...acc,count:as.length,revenue:as.reduce((a,s)=>a+s.price,0),profit:as.reduce((a,s)=>a+s.profit,0)};}).sort((a,b)=>b.revenue-a.revenue);
   const ms={};se.forEach(s=>{if(!ms[s.model])ms[s.model]={count:0,revenue:0};ms[s.model].count++;ms[s.model].revenue+=s.price;});
   const topM=Object.entries(ms).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
-  const p={st,upd,se,oe,accStats,topM,stock,expenses,caja,stockAlert,totalUnits,totalRev,totalProfit,totalExp,totalNet,avgM,weekRev,monthRev,weekProfit,monthProfit,weekNet,monthNet,stockVal,pendAmt,cajaSaldo,cajaIn,cajaOut};
+  const p={st,upd,se,oe,accStats,topM,stock,expenses,caja,stockAlert,totalUnits,totalRev,totalCost,totalProfit,totalExp,totalNet,avgM,weekRev,monthRev,weekProfit,monthProfit,weekNet,monthNet,stockVal,pendAmt,cajaSaldo,cajaIn,cajaOut};
   return(
     <div className="app">
       <div className="header">
