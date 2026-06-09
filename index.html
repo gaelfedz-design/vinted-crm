@@ -163,8 +163,17 @@ function App(){
   const totalExp=expenses.reduce((a,e)=>a+e.amount,0);
   const totalNet=totalProfit-totalExp;
   const avgM=totalRev>0?(totalNet/totalRev*100):0;
-  const weekRev=[...se,...oe].filter(s=>new Date(s.date||s.createdAt)>=wa).reduce((a,s)=>a+(s.price||s.rev||0),0);
-  const monthRev=[...se,...oe].filter(s=>new Date(s.date||s.createdAt)>=ma).reduce((a,s)=>a+(s.price||s.rev||0),0);
+  const allOps=[...se,...oe];
+  const weekOps=allOps.filter(s=>new Date(s.date||s.createdAt)>=wa);
+  const monthOps=allOps.filter(s=>new Date(s.date||s.createdAt)>=ma);
+  const weekRev=weekOps.reduce((a,s)=>a+(s.price||s.rev||0),0);
+  const monthRev=monthOps.reduce((a,s)=>a+(s.price||s.rev||0),0);
+  const weekProfit=weekOps.reduce((a,s)=>a+(s.profit||0),0);
+  const monthProfit=monthOps.reduce((a,s)=>a+(s.profit||0),0);
+  const weekExp=expenses.filter(e=>new Date(e.date)>=wa).reduce((a,e)=>a+e.amount,0);
+  const monthExp=expenses.filter(e=>new Date(e.date)>=ma).reduce((a,e)=>a+e.amount,0);
+  const weekNet=weekProfit-weekExp;
+  const monthNet=monthProfit-monthExp;
   const stockVal=stock.reduce((a,i)=>a+i.qty*i.cost,0);
   const pendAmt=oe.filter(o=>o.status==="pendiente").reduce((a,o)=>a+o.rev,0);
   const cajaSaldo=caja.reduce((a,c)=>a+(c.type==="entrada"?c.amount:-c.amount),0);
@@ -173,7 +182,7 @@ function App(){
   const accStats=(st.accounts||[]).map(acc=>{const as=se.filter(s=>s.accountId===acc.id);return{...acc,count:as.length,revenue:as.reduce((a,s)=>a+s.price,0),profit:as.reduce((a,s)=>a+s.profit,0)};}).sort((a,b)=>b.revenue-a.revenue);
   const ms={};se.forEach(s=>{if(!ms[s.model])ms[s.model]={count:0,revenue:0};ms[s.model].count++;ms[s.model].revenue+=s.price;});
   const topM=Object.entries(ms).sort((a,b)=>b[1].count-a[1].count).slice(0,5);
-  const p={st,upd,se,oe,accStats,topM,stock,expenses,caja,stockAlert,totalUnits,totalRev,totalProfit,totalExp,totalNet,avgM,weekRev,monthRev,stockVal,pendAmt,cajaSaldo,cajaIn,cajaOut};
+  const p={st,upd,se,oe,accStats,topM,stock,expenses,caja,stockAlert,totalUnits,totalRev,totalProfit,totalExp,totalNet,avgM,weekRev,monthRev,weekProfit,monthProfit,weekNet,monthNet,stockVal,pendAmt,cajaSaldo,cajaIn,cajaOut};
   return(
     <div className="app">
       <div className="header">
@@ -199,20 +208,42 @@ function App(){
   );
 }
 
-function Dash({totalRev,totalNet,avgM,weekRev,monthRev,se,oe,accStats,topM,stockAlert,totalUnits,stockVal,cajaSaldo,pendAmt}){
+function Dash({totalRev,totalNet,avgM,weekRev,monthRev,weekProfit,monthProfit,weekNet,monthNet,se,oe,accStats,topM,stockAlert,totalUnits,stockVal,cajaSaldo,pendAmt}){
   const mr=accStats[0]?.revenue||1,mm=topM[0]?.[1]?.count||1;
   return(
     <div>
       <div className="sec">Resultados</div>
-      <div className="g4" style={{marginBottom:10}}>
-        {[{l:"Semana",v:f(weekRev),s:"últimos 7 días",c:""},{l:"30 días",v:f(monthRev),s:"últimos 30 días",c:""},{l:"Facturación total",v:f(totalRev),s:`${se.length+oe.length} operaciones`,c:""},{l:"Beneficio neto",v:f(totalNet),s:`Margen ${avgM.toFixed(1)}%`,c:totalNet>=0?"cg":"cr"}].map(k=>(
-          <div key={k.l} className="card"><div className="kl">{k.l}</div><div className={"kv "+k.c}>{k.v}</div><div className="ks">{k.s}</div></div>
-        ))}
+      <div className="g3" style={{marginBottom:10}}>
+        <div className="card">
+          <div className="kl">Esta semana</div>
+          <div className="kv">{f(weekRev)}</div>
+          <div className="ks" style={{marginTop:6,display:"flex",flexDirection:"column",gap:3}}>
+            <span>Beneficio bruto: <strong style={{color:"#34c759"}}>{f(weekProfit)}</strong></span>
+            <span>Beneficio neto: <strong style={{color:weekNet>=0?"#34c759":"#ff3b30"}}>{f(weekNet)}</strong></span>
+          </div>
+        </div>
+        <div className="card">
+          <div className="kl">Últimos 30 días</div>
+          <div className="kv">{f(monthRev)}</div>
+          <div className="ks" style={{marginTop:6,display:"flex",flexDirection:"column",gap:3}}>
+            <span>Beneficio bruto: <strong style={{color:"#34c759"}}>{f(monthProfit)}</strong></span>
+            <span>Beneficio neto: <strong style={{color:monthNet>=0?"#34c759":"#ff3b30"}}>{f(monthNet)}</strong></span>
+          </div>
+        </div>
+        <div className="card">
+          <div className="kl">Total acumulado</div>
+          <div className="kv">{f(totalRev)}</div>
+          <div className="ks" style={{marginTop:6,display:"flex",flexDirection:"column",gap:3}}>
+            <span>{se.length+oe.length} operaciones</span>
+            <span>Beneficio neto: <strong style={{color:totalNet>=0?"#34c759":"#ff3b30"}}>{f(totalNet)}</strong></span>
+            <span>Margen: <strong>{avgM.toFixed(1)}%</strong></span>
+          </div>
+        </div>
       </div>
       <div className="g4" style={{marginBottom:10}}>
         <div className="card"><div className="kl">Ventas Vinted</div><div className="kv cb">{f(se.reduce((a,s)=>a+s.price,0))}</div><div className="ks">{se.length} ventas</div></div>
         <div className="card"><div className="kl">Pedidos directos</div><div className="kv cp">{f(oe.reduce((a,o)=>a+o.rev,0))}</div><div className="ks">{oe.length} pedidos</div></div>
-        <div className="card"><div className="kl">Stock inmovilizado</div><div className="kv cy">{f(stockVal)}</div><div className="ks">{totalUnits} uds disponibles</div></div>
+        <div className="card"><div className="kl">Stock inmovilizado</div><div className="kv cy">{f(stockVal)}</div><div className="ks">{totalUnits} uds</div></div>
         <div className="card" style={{border:"1px solid "+(cajaSaldo>=0?"#c8f0d8":"#ffd5d5")}}><div className="kl">Saldo caja</div><div className={"kv "+(cajaSaldo>=0?"cg":"cr")}>{f(cajaSaldo)}</div><div className="ks">{pendAmt>0?`+${f(pendAmt)} pendiente`:""}</div></div>
       </div>
       {stockAlert&&<div className="ab abr" style={{marginBottom:10}}><div><div className="abt cr">Hacer pedido — stock bajo</div><div className="abm">{totalUnits} uds totales (mínimo {STOCK_MIN})</div></div></div>}
