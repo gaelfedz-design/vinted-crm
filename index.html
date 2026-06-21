@@ -23,6 +23,7 @@ body{background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFo
 .sd{width:6px;height:6px;border-radius:50%;background:#34c759;}
 .sd.syncing{background:#ff9500;animation:bl .5s infinite;}
 .sd.error{background:#ff3b30;}
+.sd.local{background:#007aff;}
 @keyframes bl{0%,100%{opacity:1;}50%{opacity:.3;}}
 .pl{border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;}
 .plr{background:#fff3f3;color:#ff3b30;border:1px solid #ffd5d5;}
@@ -104,8 +105,9 @@ body{background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFo
 .chv.open{transform:rotate(90deg);}
 /* CHART */
 .chart-wrap{width:100%;overflow:hidden;}
-.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 2px;}
-.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;}
+.bar-chart{display:flex;align-items:stretch;gap:6px;height:96px;padding:0 2px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-width:0;}
+.bar-box{height:76px;width:100%;display:flex;align-items:flex-end;}
 .bar{width:100%;border-radius:4px 4px 0 0;transition:height .3s;min-height:2px;}
 .bar-lbl{font-size:9px;color:#86868b;margin-top:3px;white-space:nowrap;}
 .delta{font-size:11px;font-weight:600;padding:1px 6px;border-radius:6px;}
@@ -118,43 +120,87 @@ body{background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFo
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#86868b;text-align:center;padding:24px;">
+    Cargando Vinted CRM... Si este mensaje no desaparece, revisa la conexión a internet o el bloqueo de los CDN de React/Babel.
+  </div>
+</div>
 <script type="text/babel">
 const {useState,useEffect,useCallback,useMemo}=React;
 const TABS=["Dashboard","Ventas","Pedidos","Stock","Gastos","Caja","Cuentas","Alertas"];
 const ECATS=["Packaging","Transporte","Publicidad","Suscripciones","Otro"];
 const STOCK_MIN=30;
 const FB={apiKey:"AIzaSyDOXzUoalwy-nScM1TaHzGGQ7rnoPnquU4",authDomain:"vinted-crm-bd15e.firebaseapp.com",projectId:"vinted-crm-bd15e"};
-const IS={accounts:[{id:1,name:"Cuenta 1",phone:"",email:"",password:"",bank:"",desc:"",tag:"",phoneModel:"",simPin:""},{id:2,name:"Cuenta 2",phone:"",email:"",password:"",bank:"",desc:"",tag:"",phoneModel:"",simPin:""}],sales:[],stock:[],expenses:[],orders:[],caja:[],alertConfig:{low:5,urgent:2}};
-firebase.initializeApp(FB);
-const db=firebase.firestore();
+const IS={accounts:[{id:1,name:"Cuenta 1",phone:"",email:"",password:"",bank:"",desc:"",tag:""},{id:2,name:"Cuenta 2",phone:"",email:"",password:"",bank:"",desc:"",tag:""}],sales:[],stock:[],expenses:[],orders:[],caja:[],alertConfig:{low:5,urgent:2}};
+const STORAGE_KEY="vinted-crm-data-v2";
+let db=null;
+try{
+  if(window.firebase){
+    firebase.initializeApp(FB);
+    db=firebase.firestore();
+  }
+}catch(err){
+  console.warn("Firebase no disponible, usando almacenamiento local.",err);
+}
 const f=n=>(parseFloat(n)||0).toFixed(2)+"€";
-const fd=d=>d?new Date(d).toLocaleDateString("es",{day:"2-digit",month:"2-digit",year:"2-digit"}):"—";
-const today=()=>new Date().toISOString().slice(0,10);
+const num=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:0;};
+const int=v=>{const n=parseInt(v,10);return Number.isFinite(n)?n:0;};
+const parseDate=d=>{
+  if(!d)return new Date(NaN);
+  if(d instanceof Date)return d;
+  const [y,m,day]=String(d).slice(0,10).split("-").map(Number);
+  return y&&m&&day?new Date(y,m-1,day):new Date(d);
+};
+const fd=d=>d?parseDate(d).toLocaleDateString("es",{day:"2-digit",month:"2-digit",year:"2-digit"}):"—";
+const today=()=>{const d=new Date();const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;};
 const daysAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return d;};
+const startDay=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const inRange=(d,from,to)=>{const dd=parseDate(d);return dd>=from&&dd<to;};
+const loadLocal=()=>{
+  try{return {...IS,...JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")};}
+  catch{return IS;}
+};
+const saveLocal=data=>{
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}
+  catch(err){console.warn("No se pudo guardar localmente.",err);}
+};
 
 function App(){
-  const [st,setSt]=useState(null);
+  const [st,setSt]=useState(()=>loadLocal());
   const [tab,setTab]=useState("Dashboard");
   const [sync,setSync]=useState("syncing");
   useEffect(()=>{
+    if(!db){
+      setSt(loadLocal());
+      setSync("local");
+      return;
+    }
     const u=db.collection("crm").doc("data").onSnapshot(snap=>{
-      setSt(snap.exists?{...IS,...snap.data()}:IS);
-      if(!snap.exists)db.collection("crm").doc("data").set(IS);
+      const data=snap.exists?{...IS,...snap.data()}:loadLocal();
+      setSt(data);
+      saveLocal(data);
+      if(!snap.exists)db.collection("crm").doc("data").set(data).catch(()=>setSync("local"));
       setSync("synced");
-    },()=>setSync("error"));
+    },()=>{
+      setSt(loadLocal());
+      setSync("local");
+    });
     return()=>u();
   },[]);
   const upd=useCallback(fn=>{
     setSt(prev=>{
-      const ns=typeof fn==="function"?fn(prev):fn;
+      const ns=typeof fn==="function"?fn(prev||loadLocal()):fn;
+      saveLocal(ns);
       setSync("syncing");
-      db.collection("crm").doc("data").set(ns).then(()=>setSync("synced")).catch(()=>setSync("error"));
+      if(db){
+        db.collection("crm").doc("data").set(ns).then(()=>setSync("synced")).catch(()=>setSync("local"));
+      }else{
+        setSync("local");
+      }
       return ns;
     });
   },[]);
-  if(!st)return <div className="ls2"><div className="sp"/><div style={{color:"#86868b",fontSize:13}}>Cargando...</div></div>;
-
   const stock=st.stock||[];
   const sales=st.sales||[];
   const orders=st.orders||[];
@@ -164,46 +210,46 @@ function App(){
   // Enrich sales - coste desde stock por id o modelo+talla
   const se=useMemo(()=>sales.map(s=>{
     const it=stock.find(i=>i.id===s.stockItemId)||stock.find(i=>i.model===s.model&&i.size===s.size);
-    const cost=it?it.cost:(s.cost||0);
-    return{...s,cost,profit:s.price-cost};
+    const cost=s.cost!==undefined&&s.cost!==null&&s.cost!==""?num(s.cost):(it?num(it.cost):0);
+    const price=num(s.price);
+    return{...s,price,cost,profit:price-cost};
   }),[sales,stock]);
 
   // Pedidos directos - sin stock, solo nombre+fecha+coste+facturación
   const oe=useMemo(()=>(orders||[]).map(o=>({
     ...o,
-    revenue:parseFloat(o.revenue)||0,
-    cost:parseFloat(o.cost)||0,
-    profit:(parseFloat(o.revenue)||0)-(parseFloat(o.cost)||0),
+    revenue:num(o.revenue),
+    cost:num(o.cost),
+    profit:num(o.revenue)-num(o.cost),
   })),[orders]);
 
   // Periodos
   const now=new Date();
-  const startOfToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const startOfYesterday=new Date(startOfToday-86400000);
-  const w0=daysAgo(7),w1=daysAgo(14);
+  const startOfToday=startDay(now);
+  const startOfTomorrow=addDays(startOfToday,1);
+  const startOfYesterday=addDays(startOfToday,-1);
+  const w0=addDays(startOfToday,-6),w1=addDays(startOfToday,-13);
   const m0=new Date(now.getFullYear(),now.getMonth(),1);
   const m1=new Date(now.getFullYear(),now.getMonth()-1,1);
-  const m1end=new Date(now.getFullYear(),now.getMonth(),0);
-
-  const inRange=(d,from,to)=>{const dd=new Date(d);return dd>=from&&dd<to;};
+  const m1end=m0;
 
   // Ventas por periodo
-  const salesToday=se.filter(s=>new Date(s.date)>=startOfToday);
+  const salesToday=se.filter(s=>inRange(s.date,startOfToday,startOfTomorrow));
   const salesYest=se.filter(s=>inRange(s.date,startOfYesterday,startOfToday));
-  const salesThisWeek=se.filter(s=>new Date(s.date)>=w0);
+  const salesThisWeek=se.filter(s=>parseDate(s.date)>=w0);
   const salesLastWeek=se.filter(s=>inRange(s.date,w1,w0));
-  const salesThisMonth=se.filter(s=>new Date(s.date)>=m0);
+  const salesThisMonth=se.filter(s=>parseDate(s.date)>=m0);
   const salesLastMonth=se.filter(s=>inRange(s.date,m1,m1end));
 
   // Revenue por periodo (ventas + pedidos)
-  const revPeriod=(salArr,ordArr)=>salArr.reduce((a,s)=>a+s.price,0)+ordArr.reduce((a,o)=>a+o.revenue,0);
-  const profitPeriod=(salArr,ordArr)=>salArr.reduce((a,s)=>a+s.profit,0)+ordArr.reduce((a,o)=>a+o.profit,0);
+  const revPeriod=(salArr,ordArr)=>salArr.reduce((a,s)=>a+num(s.price),0)+ordArr.reduce((a,o)=>a+num(o.revenue),0);
+  const profitPeriod=(salArr,ordArr)=>salArr.reduce((a,s)=>a+num(s.profit),0)+ordArr.reduce((a,o)=>a+num(o.profit),0);
 
-  const ordToday=oe.filter(o=>new Date(o.date)>=startOfToday);
+  const ordToday=oe.filter(o=>inRange(o.date,startOfToday,startOfTomorrow));
   const ordYest=oe.filter(o=>inRange(o.date,startOfYesterday,startOfToday));
-  const ordThisWeek=oe.filter(o=>new Date(o.date)>=w0);
+  const ordThisWeek=oe.filter(o=>parseDate(o.date)>=w0);
   const ordLastWeek=oe.filter(o=>inRange(o.date,w1,w0));
-  const ordThisMonth=oe.filter(o=>new Date(o.date)>=m0);
+  const ordThisMonth=oe.filter(o=>parseDate(o.date)>=m0);
   const ordLastMonth=oe.filter(o=>inRange(o.date,m1,m1end));
 
   const todayRev=revPeriod(salesToday,ordToday);
@@ -218,51 +264,51 @@ function App(){
   const monthProfit=profitPeriod(salesThisMonth,ordThisMonth);
   const lastMonthProfit=profitPeriod(salesLastMonth,ordLastMonth);
 
-  const weekExp=expenses.filter(e=>new Date(e.date)>=w0).reduce((a,e)=>a+e.amount,0);
-  const monthExp=expenses.filter(e=>new Date(e.date)>=m0).reduce((a,e)=>a+e.amount,0);
+  const weekExp=expenses.filter(e=>parseDate(e.date)>=w0).reduce((a,e)=>a+num(e.amount),0);
+  const monthExp=expenses.filter(e=>parseDate(e.date)>=m0).reduce((a,e)=>a+num(e.amount),0);
   const weekNet=weekProfit-weekExp;
   const monthNet=monthProfit-monthExp;
 
   // Totales
-  const totalSalesRev=se.reduce((a,s)=>a+s.price,0);
-  const totalSalesCost=se.reduce((a,s)=>a+s.cost,0);
-  const totalOrdersRev=oe.reduce((a,o)=>a+o.revenue,0);
-  const totalOrdersCost=oe.reduce((a,o)=>a+o.cost,0);
+  const totalSalesRev=se.reduce((a,s)=>a+num(s.price),0);
+  const totalSalesCost=se.reduce((a,s)=>a+num(s.cost),0);
+  const totalOrdersRev=oe.reduce((a,o)=>a+num(o.revenue),0);
+  const totalOrdersCost=oe.reduce((a,o)=>a+num(o.cost),0);
   const totalRev=totalSalesRev+totalOrdersRev;
   const totalCost=totalSalesCost+totalOrdersCost;
   const totalProfit=totalRev-totalCost; // Beneficio bruto
-  const totalExp=expenses.reduce((a,e)=>a+e.amount,0);
+  const totalExp=expenses.reduce((a,e)=>a+num(e.amount),0);
   const totalNet=totalProfit-totalExp; // Beneficio neto
   const avgM=totalRev>0?(totalNet/totalRev*100):0;
 
-  const totalUnits=stock.reduce((a,i)=>a+i.qty,0);
+  const totalUnits=stock.reduce((a,i)=>a+int(i.qty),0);
   const stockAlert=totalUnits<STOCK_MIN;
-  const stockVal=stock.reduce((a,i)=>a+i.qty*i.cost,0);
-  const pendAmt=oe.filter(o=>o.status==="pendiente").reduce((a,o)=>a+o.revenue,0);
-  const cajaSaldo=caja.reduce((a,c)=>a+(c.type==="entrada"?c.amount:-c.amount),0);
-  const cajaIn=caja.filter(c=>c.type==="entrada").reduce((a,c)=>a+c.amount,0);
-  const cajaOut=caja.filter(c=>c.type==="salida").reduce((a,c)=>a+c.amount,0);
+  const stockVal=stock.reduce((a,i)=>a+int(i.qty)*num(i.cost),0);
+  const pendAmt=oe.filter(o=>o.status==="pendiente").reduce((a,o)=>a+num(o.revenue),0);
+  const cajaSaldo=caja.reduce((a,c)=>a+(c.type==="entrada"?num(c.amount):-num(c.amount)),0);
+  const cajaIn=caja.filter(c=>c.type==="entrada").reduce((a,c)=>a+num(c.amount),0);
+  const cajaOut=caja.filter(c=>c.type==="salida").reduce((a,c)=>a+num(c.amount),0);
 
   const accStats=(st.accounts||[]).map(acc=>{
     const as=se.filter(s=>s.accountId===acc.id);
-    return{...acc,count:as.length,revenue:as.reduce((a,s)=>a+s.price,0),profit:as.reduce((a,s)=>a+s.profit,0)};
+    return{...acc,count:as.length,revenue:as.reduce((a,s)=>a+num(s.price),0),profit:as.reduce((a,s)=>a+num(s.profit),0)};
   }).sort((a,b)=>b.revenue-a.revenue);
 
   // Top modelos
   const ms={};
-  se.forEach(s=>{if(!ms[s.model])ms[s.model]={count:0,revenue:0,profit:0};ms[s.model].count++;ms[s.model].revenue+=s.price;ms[s.model].profit+=s.profit;});
+  se.forEach(s=>{const model=s.model||"Sin modelo";if(!ms[model])ms[model]={count:0,revenue:0,profit:0};ms[model].count++;ms[model].revenue+=num(s.price);ms[model].profit+=num(s.profit);});
   const topM=Object.entries(ms).sort((a,b)=>b[1].revenue-a[1].revenue).slice(0,5);
 
   // Ventas por día últimos 7 días
   const dailySales=Array.from({length:7},(_,i)=>{
-    const d=daysAgo(6-i);
-    const d2=daysAgo(5-i);
-    const rev=se.filter(s=>inRange(s.date,d,d2)).reduce((a,s)=>a+s.price,0)+oe.filter(o=>inRange(o.date,d,d2)).reduce((a,o)=>a+o.revenue,0);
+    const d=addDays(startOfToday,i-6);
+    const d2=addDays(d,1);
+    const rev=se.filter(s=>inRange(s.date,d,d2)).reduce((a,s)=>a+num(s.price),0)+oe.filter(o=>inRange(o.date,d,d2)).reduce((a,o)=>a+num(o.revenue),0);
     const lbl=d.toLocaleDateString("es",{weekday:"short"});
     return{lbl,rev};
   });
 
-  const p={st,upd,se,oe,accStats,topM,stock,expenses,caja,stockAlert,totalUnits,totalRev,totalCost,totalProfit,totalExp,totalNet,avgM,todayRev,yesterdayRev,weekRev,lastWeekRev,monthRev,lastMonthRev,weekProfit,lastWeekProfit,monthProfit,lastMonthProfit,weekNet,monthNet,stockVal,pendAmt,cajaSaldo,cajaIn,cajaOut,vintedRetenido,cajaDisponible,dailySales,totalSalesRev,totalOrdersRev};
+  const p={st,upd,se,oe,accStats,topM,stock,expenses,caja,stockAlert,totalUnits,totalRev,totalCost,totalProfit,totalExp,totalNet,avgM,todayRev,yesterdayRev,weekRev,lastWeekRev,monthRev,lastMonthRev,weekProfit,lastWeekProfit,monthProfit,lastMonthProfit,weekNet,monthNet,stockVal,pendAmt,cajaSaldo,cajaIn,cajaOut,dailySales,totalSalesRev,totalOrdersRev};
 
   return(
     <div className="app">
@@ -305,7 +351,9 @@ function BarChart({data,color="#1d1d1f"}){
       <div className="bar-chart">
         {data.map((d,i)=>(
           <div key={i} className="bar-col">
-            <div className="bar" style={{height:`${Math.max((d.rev/max)*100,2)}%`,background:color,opacity:d.rev>0?1:0.2}}/>
+            <div className="bar-box">
+              <div className="bar" title={`${d.lbl}: ${f(d.rev)}`} style={{height:`${Math.max((d.rev/max)*100,2)}%`,background:color,opacity:d.rev>0?1:0.2}}/>
+            </div>
             <div className="bar-lbl">{d.lbl}</div>
           </div>
         ))}
@@ -355,7 +403,7 @@ function Dash({todayRev,yesterdayRev,weekRev,lastWeekRev,monthRev,lastMonthRev,w
         </div>
         <div className="card">
           <div className="kl">Ventas hoy</div>
-          <div className="kv">{se.filter(s=>new Date(s.date)>=new Date(new Date().setHours(0,0,0,0))).length}</div>
+          <div className="kv">{se.filter(s=>inRange(s.date,startDay(new Date()),addDays(startDay(new Date()),1))).length}</div>
           <div className="ks">operaciones del día</div>
         </div>
         <div className="card" style={{border:"1px solid "+(cajaSaldo>=0?"#c8f0d8":"#ffd5d5")}}>
@@ -492,14 +540,21 @@ function Ventas({st,upd,se,stock}){
   const [ef,setEf]=useState(null);
   const opts=stock.map(i=>({id:i.id,label:`${i.model} — ${i.size}`,model:i.model,size:i.size,cost:i.cost,qty:i.qty}));
   const sel=opts.find(o=>o.id===Number(form.sid));
-  const prev=sel&&form.price?parseFloat(form.price)-sel.cost:null;
+  const prev=sel&&form.price?num(form.price)-num(sel.cost):null;
   const add=()=>{
     if(!sel||!form.price)return;
-    if(sel.qty<=0){alert("Sin stock disponible.");return;}
-    const s={id:Date.now(),stockItemId:sel.id,model:sel.model,size:sel.size,price:parseFloat(form.price),accountId:Number(form.aid),date:form.date,channel:"vinted"};
-    upd(x=>({...x,sales:[s,...(x.sales||[])],stock:(x.stock||[]).map(i=>i.id===sel.id?{...i,qty:Math.max(0,i.qty-1)}:i)}));
+    if(int(sel.qty)<=0){alert("Sin stock disponible.");return;}
+    const price=num(form.price);
+    if(!Number.isFinite(price)||price<0){alert("Introduce un precio válido.");return;}
+    const s={id:Date.now(),stockItemId:sel.id,model:sel.model,size:sel.size,cost:num(sel.cost),price,accountId:Number(form.aid),date:form.date,channel:"vinted"};
+    upd(x=>({...x,sales:[s,...(x.sales||[])],stock:(x.stock||[]).map(i=>i.id===sel.id?{...i,qty:Math.max(0,int(i.qty)-1)}:i)}));
     setForm(blank);
   };
+  const del=sale=>upd(x=>({
+    ...x,
+    sales:(x.sales||[]).filter(v=>v.id!==sale.id),
+    stock:(x.stock||[]).map(i=>i.id===sale.stockItemId?{...i,qty:int(i.qty)+1}:i)
+  }));
   const filtered=se.filter(s=>!filter||s.model?.toLowerCase().includes(filter.toLowerCase()));
   return(
     <div>
@@ -509,7 +564,7 @@ function Ventas({st,upd,se,stock}){
           <div className="fg"><label className="fl">Modelo y talla</label>
             <select className="fi" value={form.sid} onChange={e=>setForm(v=>({...v,sid:Number(e.target.value)}))}>
               <option value="">Seleccionar...</option>
-              {opts.filter(o=>o.qty>0).map(o=><option key={o.id} value={o.id}>{o.label} ({o.qty})</option>)}
+              {opts.filter(o=>int(o.qty)>0).map(o=><option key={o.id} value={o.id}>{o.label} ({int(o.qty)})</option>)}
             </select>
           </div>
           <div className="fg"><label className="fl">Cuenta</label>
@@ -525,7 +580,7 @@ function Ventas({st,upd,se,stock}){
             {sel&&form.price&&<div className="pp">
               <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Coste</span><span className="ppv cr">{f(sel.cost)}</span></div>
               <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Beneficio</span><span className={"ppv "+(prev>=0?"cg":"cr")}>{f(prev)}</span></div>
-              <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Margen</span><span className="ppv">{form.price>0?((prev/parseFloat(form.price))*100).toFixed(1):0}%</span></div>
+              <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Margen</span><span className="ppv">{num(form.price)>0?((prev/num(form.price))*100).toFixed(1):0}%</span></div>
             </div>}
           </div>
         </div>
@@ -551,7 +606,7 @@ function Ventas({st,upd,se,stock}){
               <td><span className={"badge "+(s.profit>=0?"bgg":"bgr")}>{f(s.profit)}</span></td>
               <td style={{display:"flex",gap:4}}>
                 <button className="be" onClick={()=>{setEid(s.id);setEf({price:String(s.price),aid:s.accountId,date:s.date});}}>Editar</button>
-                <button className="bd" onClick={()=>upd(x=>({...x,sales:(x.sales||[]).filter(v=>v.id!==s.id)}))}>Eliminar</button>
+                <button className="bd" onClick={()=>del(s)}>Eliminar</button>
               </td>
             </tr>;
           })}</tbody>
@@ -568,7 +623,12 @@ function Ventas({st,upd,se,stock}){
           </div>
           <div className="fg"><label className="fl">Fecha</label><input className="fi" type="date" value={ef.date} onChange={e=>setEf(v=>({...v,date:e.target.value}))}/></div>
           <div style={{display:"flex",gap:8}}>
-            <button className="btn bp" onClick={()=>{upd(x=>({...x,sales:(x.sales||[]).map(v=>v.id===eid?{...v,price:parseFloat(ef.price),accountId:Number(ef.aid),date:ef.date}:v)}));setEid(null);}}>Guardar</button>
+            <button className="btn bp" onClick={()=>{
+              const price=num(ef.price);
+              if(!Number.isFinite(price)||price<0){alert("Introduce un precio válido.");return;}
+              upd(x=>({...x,sales:(x.sales||[]).map(v=>v.id===eid?{...v,price,accountId:Number(ef.aid),date:ef.date}:v)}));
+              setEid(null);
+            }}>Guardar</button>
             <button className="btn bg" onClick={()=>setEid(null)}>Cancelar</button>
           </div>
         </div>
@@ -586,12 +646,14 @@ function Pedidos({st,upd,oe}){
   const [ef,setEf]=useState(null);
   const save=()=>{
     if(!form.name||!form.revenue)return;
-    const o={id:Date.now(),name:form.name,date:form.date,revenue:parseFloat(form.revenue)||0,cost:parseFloat(form.cost)||0,status:form.status,notes:form.notes};
+    const revenue=num(form.revenue),cost=num(form.cost);
+    if(revenue<0||cost<0){alert("Introduce importes válidos.");return;}
+    const o={id:Date.now(),name:form.name,date:form.date,revenue,cost,status:form.status,notes:form.notes};
     upd(x=>({...x,orders:[o,...(x.orders||[])]}));
     setForm(blank);setShow(false);
   };
-  const totalRev=oe.reduce((a,o)=>a+o.revenue,0);
-  const totalProfit=oe.reduce((a,o)=>a+o.profit,0);
+  const totalRev=oe.reduce((a,o)=>a+num(o.revenue),0);
+  const totalProfit=oe.reduce((a,o)=>a+num(o.profit),0);
   const pending=oe.filter(o=>o.status==="pendiente");
   return(
     <div>
@@ -621,8 +683,8 @@ function Pedidos({st,upd,oe}){
           <div className="fg"><label className="fl">Coste total (€)</label><input className="fi" type="number" placeholder="0.00" value={form.cost} onChange={e=>setForm(v=>({...v,cost:e.target.value}))}/></div>
         </div>
         {form.revenue&&form.cost&&<div className="pp" style={{marginBottom:10}}>
-          <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Beneficio</span><span className={"ppv "+(parseFloat(form.revenue)-parseFloat(form.cost)>=0?"cg":"cr")}>{f(parseFloat(form.revenue)-parseFloat(form.cost))}</span></div>
-          <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Margen</span><span className="ppv">{(((parseFloat(form.revenue)-parseFloat(form.cost))/parseFloat(form.revenue))*100).toFixed(1)}%</span></div>
+          <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Beneficio</span><span className={"ppv "+(num(form.revenue)-num(form.cost)>=0?"cg":"cr")}>{f(num(form.revenue)-num(form.cost))}</span></div>
+          <div className="ppi"><span style={{fontSize:10,color:"#86868b"}}>Margen</span><span className="ppv">{num(form.revenue)>0?(((num(form.revenue)-num(form.cost))/num(form.revenue))*100).toFixed(1):0}%</span></div>
         </div>}
         <div className="fg"><label className="fl">Notas (opcional)</label><input className="fi" placeholder="Descripción del pedido..." value={form.notes} onChange={e=>setForm(v=>({...v,notes:e.target.value}))}/></div>
         <button className="btn bp" onClick={save}>Guardar pedido</button>
@@ -638,7 +700,7 @@ function Pedidos({st,upd,oe}){
               </div>
               <div style={{display:"flex",gap:6}}>
                 <button className="be" onClick={()=>{setEid(o.id);setEf({name:o.name,date:o.date,revenue:String(o.revenue),cost:String(o.cost),status:o.status,notes:o.notes||""});}}>Editar</button>
-                <button className="bd" onClick={()=>upd(x=>({...x,orders:(x.orders||[]).filter(v=>v.id!==o.id),caja:(x.caja||[]).filter(c=>c.refId!==o.id)}))}>Eliminar</button>
+                <button className="bd" onClick={()=>upd(x=>({...x,orders:(x.orders||[]).filter(v=>v.id!==o.id)}))}>Eliminar</button>
               </div>
             </div>
             <div style={{display:"flex",gap:20,flexWrap:"wrap",fontSize:13}}>
@@ -667,7 +729,12 @@ function Pedidos({st,upd,oe}){
           </div>
           <div className="fg"><label className="fl">Notas</label><input className="fi" value={ef.notes} onChange={e=>setEf(v=>({...v,notes:e.target.value}))}/></div>
           <div style={{display:"flex",gap:8}}>
-            <button className="btn bp" onClick={()=>{upd(x=>({...x,orders:(x.orders||[]).map(v=>v.id===eid?{...v,...ef,revenue:parseFloat(ef.revenue),cost:parseFloat(ef.cost)}:v)}));setEid(null);}}>Guardar</button>
+            <button className="btn bp" onClick={()=>{
+              const revenue=num(ef.revenue),cost=num(ef.cost);
+              if(revenue<0||cost<0){alert("Introduce importes válidos.");return;}
+              upd(x=>({...x,orders:(x.orders||[]).map(v=>v.id===eid?{...v,...ef,revenue,cost}:v)}));
+              setEid(null);
+            }}>Guardar</button>
             <button className="btn bg" onClick={()=>setEid(null)}>Cancelar</button>
           </div>
         </div>
@@ -677,37 +744,68 @@ function Pedidos({st,upd,oe}){
 }
 
 /* ── STOCK ── */
-function Stock({st,upd,stock,totalUnits,stockAlert}){
+function Stock({st,upd,stock,totalUnits,stockAlert,se=[]}){
   const [form,setForm]=useState({model:"",size:"",qty:"",cost:"",alertAt:""});
   const [eid,setEid]=useState(null);
   const [og,setOg]=useState({});
   const [rid,setRid]=useState(null);
   const [rqty,setRqty]=useState("");
+  const [modelNames,setModelNames]=useState({});
+  const [newSize,setNewSize]=useState({});
   const grouped={};
-  stock.forEach(i=>{if(!grouped[i.model])grouped[i.model]=[];grouped[i.model].push(i);});
+  stock.forEach(i=>{const model=i.model||"Sin modelo";if(!grouped[model])grouped[model]=[];grouped[model].push({...i,model});});
   const save=()=>{
     if(!form.model||!form.qty)return;
-    const e={model:form.model.trim(),size:form.size.trim(),qty:parseInt(form.qty),cost:parseFloat(form.cost)||0,alertAt:parseInt(form.alertAt)||5};
+    const qty=int(form.qty),cost=num(form.cost),alertAt=int(form.alertAt)||5;
+    if(qty<0||cost<0||alertAt<0){alert("Introduce valores válidos.");return;}
+    const e={model:form.model.trim(),size:form.size.trim(),qty,cost,alertAt};
     if(!eid){
-      const dup=stock.find(i=>i.model.toLowerCase()===e.model.toLowerCase()&&i.size.toLowerCase()===e.size.toLowerCase());
+      const dup=stock.find(i=>(i.model||"").toLowerCase()===e.model.toLowerCase()&&(i.size||"").toLowerCase()===e.size.toLowerCase());
       if(dup){
         if(window.confirm(`"${e.model} — ${e.size}" ya existe (${dup.qty} uds). ¿Añadir ${e.qty} uds más?`)){
-          upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===dup.id?{...i,qty:i.qty+e.qty}:i)}));
+          upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===dup.id?{...i,qty:int(i.qty)+e.qty}:i)}));
           setForm({model:"",size:"",qty:"",cost:"",alertAt:""});return;
         }else return;
       }
-      upd(x=>({
-        ...x,
-        stock:[...(x.stock||[]),{...e,id:Date.now()}],
-        caja:[{id:Date.now()+1,desc:`Compra stock — ${e.model} (${e.size}) x${e.qty}`,type:"salida",amount:e.qty*e.cost,date:today(),cat:"Compra stock",auto:true},...(x.caja||[])]
-      }));
+      upd(x=>({...x,stock:[...(x.stock||[]),{...e,id:Date.now()}]}));
     }else{
       upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===eid?{...i,...e}:i)}));setEid(null);
     }
     setForm({model:"",size:"",qty:"",cost:"",alertAt:""});
   };
-  const restock=id=>{if(!rqty)return;upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===id?{...i,qty:i.qty+parseInt(rqty)}:i)}));setRid(null);setRqty("");};
-  const sv=stock.reduce((a,i)=>a+i.qty*i.cost,0);
+  const restock=id=>{const qty=int(rqty);if(qty<=0){alert("Introduce unidades válidas.");return;}upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===id?{...i,qty:int(i.qty)+qty}:i)}));setRid(null);setRqty("");};
+  const deleteItem=item=>{
+    const linked=(se||[]).filter(s=>s.stockItemId===item.id).length;
+    if(linked>0){alert(`No se puede eliminar: esta referencia tiene ${linked} venta${linked!==1?"s":""} asociada${linked!==1?"s":""}. Pon el stock a 0 si ya no la vendes.`);return;}
+    upd(x=>({...x,stock:(x.stock||[]).filter(v=>v.id!==item.id)}));
+  };
+  const renameModel=(oldModel,items)=>{
+    const next=(modelNames[oldModel]??oldModel).trim();
+    if(!next||next===oldModel)return;
+    const ids=items.map(i=>i.id);
+    upd(x=>({
+      ...x,
+      stock:(x.stock||[]).map(i=>ids.includes(i.id)?{...i,model:next}:i),
+      sales:(x.sales||[]).map(s=>ids.includes(s.stockItemId)?{...s,model:next}:s)
+    }));
+    setOg(g=>{const n={...g,[next]:true};delete n[oldModel];return n;});
+    setModelNames(v=>{const n={...v};delete n[oldModel];return n;});
+  };
+  const addSizeToModel=(model,items)=>{
+    const draft=newSize[model]||{};
+    const size=(draft.size||"").trim();
+    const qty=int(draft.qty),cost=num(draft.cost),alertAt=int(draft.alertAt)||5;
+    if(!size||qty<=0||cost<0||alertAt<0){alert("Introduce talla, unidades y valores válidos.");return;}
+    const dup=items.find(i=>(i.size||"").toLowerCase()===size.toLowerCase());
+    if(dup){
+      upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===dup.id?{...i,qty:int(i.qty)+qty,cost:cost||num(i.cost),alertAt}:i)}));
+    }else{
+      upd(x=>({...x,stock:[...(x.stock||[]),{id:Date.now(),model,size,qty,cost,alertAt}]}));
+    }
+    setNewSize(v=>({...v,[model]:{size:"",qty:"",cost:"",alertAt:""}}));
+    setOg(g=>({...g,[model]:true}));
+  };
+  const sv=stock.reduce((a,i)=>a+int(i.qty)*num(i.cost),0);
   const modelos=Object.keys(grouped).length;
   return(
     <div>
@@ -722,7 +820,7 @@ function Stock({st,upd,stock,totalUnits,stockAlert}){
           </div>
         </div>
         <div className="card"><div className="kl">Valor inmovilizado</div><div className="kv cy">{f(sv)}</div><div className="ks">{modelos} modelos distintos</div></div>
-        <div className="card"><div className="kl">Referencias</div><div className="kv">{stock.length}</div><div className="ks">{stock.filter(i=>i.qty===0).length} agotadas</div></div>
+        <div className="card"><div className="kl">Referencias</div><div className="kv">{stock.length}</div><div className="ks">{stock.filter(i=>int(i.qty)===0).length} agotadas</div></div>
       </div>
       {stockAlert&&<div className="ab abr" style={{marginBottom:12}}><div><div className="abt cr">Hacer pedido — {totalUnits} uds (mínimo {STOCK_MIN})</div></div></div>}
 
@@ -748,13 +846,14 @@ function Stock({st,upd,stock,totalUnits,stockAlert}){
       <div className="sec">Inventario — {modelos} modelos</div>
       {modelos===0&&<div className="card"><div className="empty">Sin stock registrado</div></div>}
       {Object.entries(grouped).map(([model,items])=>{
-        const tq=items.reduce((a,i)=>a+i.qty,0);
-        const tv=items.reduce((a,i)=>a+i.qty*i.cost,0);
+        const tq=items.reduce((a,i)=>a+int(i.qty),0);
+        const tv=items.reduce((a,i)=>a+int(i.qty)*num(i.cost),0);
         const isOpen=og[model];
-        const hasOut=items.some(i=>i.qty===0);
-        const hasLow=items.some(i=>i.qty>0&&i.qty<=(i.alertAt||5));
-        const pct=Math.min(100,(tq/Math.max(items.reduce((a,i)=>a+(i.alertAt||5),0)*2,10))*100);
+        const hasOut=items.some(i=>int(i.qty)===0);
+        const hasLow=items.some(i=>int(i.qty)>0&&int(i.qty)<=((int(i.alertAt)||5)));
+        const pct=Math.min(100,(tq/Math.max(items.reduce((a,i)=>a+(int(i.alertAt)||5),0)*2,10))*100);
         const statusColor=hasOut?"#ff3b30":hasLow?"#ff9500":"#34c759";
+        const draft=newSize[model]||{size:"",qty:"",cost:"",alertAt:""};
         return(
           <div key={model} className="sg">
             <div className="sgh" onClick={()=>setOg(g=>({...g,[model]:!g[model]}))}>
@@ -777,23 +876,47 @@ function Stock({st,upd,stock,totalUnits,stockAlert}){
               </div>
             </div>
             {isOpen&&<div className="sgb">
+              <div className="csm" style={{marginBottom:10}}>
+                <div className="r2">
+                  <div className="fg" style={{marginBottom:0}}>
+                    <label className="fl">Editar nombre del modelo</label>
+                    <input className="fi" value={modelNames[model]??model} onChange={e=>setModelNames(v=>({...v,[model]:e.target.value}))}/>
+                  </div>
+                  <div className="fg" style={{marginBottom:0,display:"flex",alignItems:"flex-end",gap:8}}>
+                    <button className="btn bg bsm" onClick={()=>setModelNames(v=>({...v,[model]:model}))}>Reset</button>
+                    <button className="btn bp bsm" onClick={()=>renameModel(model,items)}>Guardar modelo</button>
+                  </div>
+                </div>
+              </div>
+              <div className="csm" style={{marginBottom:10}}>
+                <div className="r3">
+                  <div className="fg"><label className="fl">Nueva talla</label><input className="fi" placeholder="S/M/L/XL" value={draft.size} onChange={e=>setNewSize(v=>({...v,[model]:{...draft,size:e.target.value}}))}/></div>
+                  <div className="fg"><label className="fl">Cantidad</label><input className="fi" type="number" min="1" value={draft.qty} onChange={e=>setNewSize(v=>({...v,[model]:{...draft,qty:e.target.value}}))}/></div>
+                  <div className="fg"><label className="fl">Coste unit. (€)</label><input className="fi" type="number" min="0" value={draft.cost} onChange={e=>setNewSize(v=>({...v,[model]:{...draft,cost:e.target.value}}))}/></div>
+                </div>
+                <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+                  <div className="fg" style={{marginBottom:0,flex:1,maxWidth:180}}><label className="fl">Alerta (uds)</label><input className="fi" type="number" min="0" placeholder="5" value={draft.alertAt} onChange={e=>setNewSize(v=>({...v,[model]:{...draft,alertAt:e.target.value}}))}/></div>
+                  <button className="btn bp bsm" onClick={()=>addSizeToModel(model,items)}>Añadir talla</button>
+                </div>
+              </div>
               <div className="tw">
                 <table className="tbl" style={{minWidth:300}}>
                   <thead><tr><th>Talla</th><th>Stock</th><th>Coste</th><th>Valor</th><th>Estado</th><th></th></tr></thead>
                   <tbody>{items.map(item=>{
-                    const p2=Math.min(100,(item.qty/Math.max((item.alertAt||5)*2,4))*100);
-                    const c=item.qty===0?"#ff3b30":item.qty<=(item.alertAt||5)?"#ff9500":"#34c759";
+                    const qty=int(item.qty),cost=num(item.cost),alertAt=int(item.alertAt)||5;
+                    const p2=Math.min(100,(qty/Math.max(alertAt*2,4))*100);
+                    const c=qty===0?"#ff3b30":qty<=alertAt?"#ff9500":"#34c759";
                     return <tr key={item.id}>
                       <td><span className="tag">{item.size}</span></td>
                       <td>
                         <div style={{display:"flex",alignItems:"center",gap:8}}>
-                          <span style={{fontWeight:700,color:c,fontSize:14}}>{item.qty}</span>
+                          <span style={{fontWeight:700,color:c,fontSize:14}}>{qty}</span>
                           <div className="pbt" style={{width:50,flexShrink:0}}><div className="pbf" style={{width:p2+"%",background:c}}/></div>
                         </div>
                       </td>
-                      <td>{f(item.cost)}</td>
-                      <td style={{color:"#ff9500"}}>{f(item.qty*item.cost)}</td>
-                      <td>{item.qty===0?<span className="badge bgr">Agotado</span>:item.qty<=(item.alertAt||5)?<span className="badge bgy">Bajo</span>:<span className="badge bgg">OK</span>}</td>
+                      <td>{f(cost)}</td>
+                      <td style={{color:"#ff9500"}}>{f(qty*cost)}</td>
+                      <td>{qty===0?<span className="badge bgr">Agotado</span>:qty<=alertAt?<span className="badge bgy">Bajo</span>:<span className="badge bgg">OK</span>}</td>
                       <td>
                         {rid===item.id?
                           <div style={{display:"flex",gap:4,alignItems:"center"}}>
@@ -804,7 +927,7 @@ function Stock({st,upd,stock,totalUnits,stockAlert}){
                           <div style={{display:"flex",gap:4}}>
                             <button className="be" onClick={()=>{setForm({model:item.model,size:item.size,qty:String(item.qty),cost:String(item.cost),alertAt:String(item.alertAt||5)});setEid(item.id);}}>Editar</button>
                             <button className="be" style={{color:"#34c759",borderColor:"#c8f0d8"}} onClick={()=>setRid(item.id)}>+Uds</button>
-                            <button className="bd" onClick={()=>upd(x=>({...x,stock:(x.stock||[]).filter(v=>v.id!==item.id)}))}>Eliminar</button>
+                            <button className="bd" onClick={()=>deleteItem(item)}>Eliminar</button>
                           </div>
                         }
                       </td>
@@ -825,11 +948,11 @@ function Gastos({st,upd,totalExp}){
   const [form,setForm]=useState({desc:"",category:"Packaging",amount:"",date:today(),recurrent:false});
   const expenses=st.expenses||[];
   const wa=daysAgo(7),ma=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-  const we=expenses.filter(e=>new Date(e.date)>=wa).reduce((a,e)=>a+e.amount,0);
-  const me=expenses.filter(e=>new Date(e.date)>=ma).reduce((a,e)=>a+e.amount,0);
-  const bc=ECATS.map(cat=>({cat,total:expenses.filter(e=>e.category===cat).reduce((a,e)=>a+e.amount,0)})).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
+  const we=expenses.filter(e=>parseDate(e.date)>=wa).reduce((a,e)=>a+num(e.amount),0);
+  const me=expenses.filter(e=>parseDate(e.date)>=ma).reduce((a,e)=>a+num(e.amount),0);
+  const bc=ECATS.map(cat=>({cat,total:expenses.filter(e=>e.category===cat).reduce((a,e)=>a+num(e.amount),0)})).filter(c=>c.total>0).sort((a,b)=>b.total-a.total);
   const mc=bc[0]?.total||1;
-  const add=()=>{if(!form.desc||!form.amount)return;upd(x=>({...x,expenses:[{...form,id:Date.now(),amount:parseFloat(form.amount)},...(x.expenses||[])]}));setForm(v=>({...v,desc:"",amount:""}));};
+  const add=()=>{if(!form.desc||!form.amount)return;const amount=num(form.amount);if(amount<0){alert("Introduce un importe válido.");return;}upd(x=>({...x,expenses:[{...form,id:Date.now(),amount},...(x.expenses||[])]}));setForm(v=>({...v,desc:"",amount:""}));};
   return(
     <div>
       <div className="g3" style={{marginBottom:14}}>
@@ -863,7 +986,7 @@ function Gastos({st,upd,totalExp}){
           <td><span className="tag">{e.category}</span></td>
           <td>{e.recurrent?<span className="badge bgp">Recurrente</span>:<span className="badge bga">Puntual</span>}</td>
           <td style={{color:"#ff3b30",fontWeight:600}}>{f(e.amount)}</td>
-          <td><button className="bd" onClick={()=>upd(x=>({...x,expenses:(x.expenses||[]).filter(v=>v.id!==e.id),caja:(x.caja||[]).filter(c=>c.refId!==e.id)}))}>Eliminar</button></td>
+          <td><button className="bd" onClick={()=>upd(x=>({...x,expenses:(x.expenses||[]).filter(v=>v.id!==e.id)}))}>Eliminar</button></td>
         </tr>)}</tbody></table>}
       </div></div>
     </div>
@@ -875,7 +998,7 @@ function Caja({st,upd,cajaSaldo,cajaIn,cajaOut,stockVal,pendAmt}){
   const [form,setForm]=useState({desc:"",type:"entrada",amount:"",date:today(),cat:"Venta Vinted"});
   const caja=st.caja||[];
   const CI=["Venta Vinted","Pedido directo","Inversión","Otro"],CO=["Compra stock","Gasto estructura","Retiro personal","Otro"];
-  const add=()=>{if(!form.desc||!form.amount)return;upd(x=>({...x,caja:[{...form,id:Date.now(),amount:parseFloat(form.amount)},...(x.caja||[])]}));setForm(v=>({...v,desc:"",amount:""}));};
+  const add=()=>{if(!form.desc||!form.amount)return;const amount=num(form.amount);if(amount<0){alert("Introduce un importe válido.");return;}upd(x=>({...x,caja:[{...form,id:Date.now(),amount},...(x.caja||[])]}));setForm(v=>({...v,desc:"",amount:""}));};
   return(
     <div>
       <div className="g4" style={{marginBottom:14}}>
@@ -909,7 +1032,7 @@ function Caja({st,upd,cajaSaldo,cajaIn,cajaOut,stockVal,pendAmt}){
       <div className="sec">Movimientos</div>
       <div className="card"><div className="tw">{caja.length===0?<div className="empty">Sin movimientos</div>:
         <table className="tbl"><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tipo</th><th>Importe</th><th>Saldo</th><th></th></tr></thead>
-        <tbody>{(()=>{let s=0;return [...caja].reverse().map(c=>{s+=c.type==="entrada"?c.amount:-c.amount;return <tr key={c.id}>
+        <tbody>{(()=>{let s=0;return [...caja].reverse().map(c=>{s+=c.type==="entrada"?num(c.amount):-num(c.amount);return <tr key={c.id}>
           <td style={{color:"#86868b"}}>{fd(c.date)}</td>
           <td style={{fontWeight:600}}>{c.desc}</td>
           <td><span className="tag">{c.cat}</span></td>
@@ -927,12 +1050,12 @@ function Caja({st,upd,cajaSaldo,cajaIn,cajaOut,stockVal,pendAmt}){
 function Cuentas({st,upd,accStats}){
   const [modal,setModal]=useState(null);
   const [spw,setSpw]=useState({});
-  const [form,setForm]=useState({name:"",phone:"",email:"",password:"",bank:"",desc:"",tag:"",phoneModel:"",simPin:""});
+  const [form,setForm]=useState({name:"",phone:"",email:"",password:"",bank:"",desc:"",tag:""});
   const [nn,setNn]=useState("");
   const tg=tag=>{const p=[["#1a1a2e","#16213e"],["#0f2027","#203a43"],["#1a0533","#2d1b4e"],["#0d1b2a","#1b2838"],["#1c1c1e","#2c2c2e"],["#0a1628","#1e3a5f"],["#1a1a1a","#2d2d2d"],["#0d2137","#1a3a5c"],["#1f1b2e","#352b57"],["#0f1923","#1a2f44"]];if(!tag)return`linear-gradient(135deg,${p[0][0]},${p[0][1]})`;let h=0;for(let i=0;i<tag.length;i++)h=tag.charCodeAt(i)+((h<<5)-h);return`linear-gradient(135deg,${p[Math.abs(h)%p.length][0]},${p[Math.abs(h)%p.length][1]})`;};
-  const oe=a=>{setForm({name:a.name,phone:a.phone||"",email:a.email||"",password:a.password||"",bank:a.bank||"",desc:a.desc||"",tag:a.tag||"",phoneModel:a.phoneModel||"",simPin:a.simPin||""});setModal(a.id);};
+  const oe=a=>{setForm({name:a.name,phone:a.phone||"",email:a.email||"",password:a.password||"",bank:a.bank||"",desc:a.desc||"",tag:a.tag||""});setModal(a.id);};
   const se=()=>{upd(x=>({...x,accounts:(x.accounts||[]).map(a=>a.id===modal?{...a,...form}:a)}));setModal(null);};
-  const add=()=>{if(!nn.trim())return;upd(x=>({...x,accounts:[...(x.accounts||[]),{id:Date.now(),name:nn.trim(),phone:"",email:"",password:"",bank:"",desc:"",tag:"",phoneModel:"",simPin:""}]}));setNn("");};
+  const add=()=>{if(!nn.trim())return;upd(x=>({...x,accounts:[...(x.accounts||[]),{id:Date.now(),name:nn.trim(),phone:"",email:"",password:"",bank:"",desc:"",tag:""}]}));setNn("");};
   return(
     <div>
       <div className="sec">Nueva cuenta</div>
@@ -963,11 +1086,9 @@ function Cuentas({st,upd,accStats}){
                 <div className="csm"><div className="kl">Beneficio</div><div style={{fontSize:14,fontWeight:700,color:"#34c759"}}>{f(a.profit)}</div></div>
                 <div className="csm"><div className="kl">Margen</div><div style={{fontSize:14,fontWeight:700,color:mg>20?"#34c759":"#ff9500"}}>{mg.toFixed(1)}%</div></div>
               </div>
-              {(a.phone||a.bank||a.password||a.phoneModel||a.simPin)&&<div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+              {(a.phone||a.bank||a.password)&&<div style={{display:"flex",flexWrap:"wrap",gap:4}}>
                 {a.phone&&<span className="ic">{a.phone}</span>}
                 {a.bank&&<span className="ic">Banco: {a.bank}</span>}
-                {a.phoneModel&&<span className="ic">📱 {a.phoneModel}</span>}
-                {a.simPin&&<span className="ic">PIN SIM: {a.simPin}</span>}
                 {a.password&&<span className="ic">Contraseña guardada</span>}
               </div>}
             </div>
@@ -983,10 +1104,6 @@ function Cuentas({st,upd,accStats}){
           <div className="fg"><label className="fl">Teléfono</label><input className="fi" placeholder="+34 600 000 000" value={form.phone} onChange={e=>setForm(v=>({...v,phone:e.target.value}))}/></div>
           <div className="fg"><label className="fl">Email</label><input className="fi" type="email" value={form.email} onChange={e=>setForm(v=>({...v,email:e.target.value}))}/></div>
           <div className="fg"><label className="fl">Cuenta bancaria</label><input className="fi" placeholder="ej. BBVA · 4521" value={form.bank} onChange={e=>setForm(v=>({...v,bank:e.target.value}))}/></div>
-          <div className="r2">
-            <div className="fg"><label className="fl">Modelo del móvil</label><input className="fi" placeholder="ej. iPhone 13" value={form.phoneModel} onChange={e=>setForm(v=>({...v,phoneModel:e.target.value}))}/></div>
-            <div className="fg"><label className="fl">PIN de la SIM</label><input className="fi" placeholder="ej. 1234" value={form.simPin} onChange={e=>setForm(v=>({...v,simPin:e.target.value}))}/></div>
-          </div>
           <div className="fg"><label className="fl">Contraseña</label>
             <div className="pwf"><input className="fi" type={spw[modal]?"text":"password"} value={form.password} onChange={e=>setForm(v=>({...v,password:e.target.value}))}/>
               <button className="pwe" onClick={()=>setSpw(p=>({...p,[modal]:!p[modal]}))}>Ver</button>
@@ -1004,10 +1121,10 @@ function Alertas({st,upd,stockAlert,totalUnits}){
   const stock=st.stock||[];
   const cfg=st.alertConfig||{low:5,urgent:2};
   const [c,setC]=useState({low:cfg.low,urgent:cfg.urgent});
-  const low=stock.filter(i=>i.qty>0&&i.qty<=(i.alertAt||cfg.low));
-  const out=stock.filter(i=>i.qty===0);
-  const save=()=>upd(x=>({...x,alertConfig:{low:parseInt(c.low),urgent:parseInt(c.urgent)}}));
-  const restock=item=>{const q=prompt(`¿Cuántas uds añadir a "${item.model}" (${item.size})?`);if(q&&!isNaN(q)&&parseInt(q)>0)upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===item.id?{...i,qty:i.qty+parseInt(q)}:i)}));};
+  const low=stock.filter(i=>int(i.qty)>0&&int(i.qty)<=(int(i.alertAt)||int(cfg.low)||5));
+  const out=stock.filter(i=>int(i.qty)===0);
+  const save=()=>upd(x=>({...x,alertConfig:{low:int(c.low),urgent:int(c.urgent)}}));
+  const restock=item=>{const q=int(prompt(`¿Cuántas uds añadir a "${item.model}" (${item.size})?`));if(q>0)upd(x=>({...x,stock:(x.stock||[]).map(i=>i.id===item.id?{...i,qty:int(i.qty)+q}:i)}));};
   return(
     <div>
       <div className="sec">Alerta global de pedido</div>
